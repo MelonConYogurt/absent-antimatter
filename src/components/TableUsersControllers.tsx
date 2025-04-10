@@ -1,6 +1,15 @@
 // Imports
-import React, {useState, useEffect, use} from "react";
+import type React from "react";
+import {useState, useEffect} from "react";
 import {Toaster, toast} from "sonner";
+import {
+  Search,
+  UserPlus,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Loader2,
+} from "lucide-react";
 
 // Types
 import type {User, FormUser} from "../models/userModel";
@@ -12,16 +21,21 @@ import DeleteUser from "@/utils/user/deleteUser";
 import UpdateUser from "@/utils/user/updateUser";
 import SearchUsers from "@/utils/user/searchUser";
 import getUsers from "@/utils/user/fetchUsers";
+import ActiveChange from "@/utils/user/aciveChange";
 
 export default function TableUsersController() {
   // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isActiveChangeModalOpen, setIsActiveModalOpen] = useState(false);
 
   // Data
   const [usersData, setUsersData] = useState<User[]>([]);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToChangeActive, setUserToChangeActive] = useState<User | null>(
+    null
+  );
   const [formUser, setFormUser] = useState<FormUser>({
     email: "",
     name: "",
@@ -30,13 +44,16 @@ export default function TableUsersController() {
   const [searchValue, setSearchValue] = useState("");
 
   // Loading and Validation States
-  const [isloading, setIsLoading] = useState(true);
-  const [isValidationFinish, SetIsValidationFinish] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isValidationFinish, setIsValidationFinish] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Pagination
-  const limit = 10;
   const [page, setPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+  const limit = 20;
+  const offset = page * limit;
+  const totalPages = Math.ceil(totalItems / limit);
 
   useEffect(() => {
     getData();
@@ -63,14 +80,14 @@ export default function TableUsersController() {
   }
 
   async function getData() {
+    setIsLoading(true);
+    setIsValidationFinish(false);
     try {
-      let offset = page * limit;
       const data = await getUsers(offset, limit);
       if (!data) return;
 
       if (data.data) {
         setUsersData(data.data);
-        setIsLoading(false);
         if (data.metadata?.total) {
           setTotalItems(data.metadata.total);
         }
@@ -85,37 +102,48 @@ export default function TableUsersController() {
       toast.error(
         `Error, por favor reporte al soporte. Tipo de error: ${error}`
       );
+    } finally {
+      setIsLoading(false);
+      setIsValidationFinish(true);
     }
   }
 
   async function handleAddUser(data: FormUser) {
-    SetIsValidationFinish(false);
-    const userData = {
-      ...data,
-      phone_number: data.phone_number,
-    };
+    setIsSubmitting(true);
+    setIsValidationFinish(false);
 
-    const validation = await AddUser(userData);
-    if (validation) {
-      toast.success("Usuario creado exitosamente");
-      getData();
-      setFormUser({
-        email: "",
-        name: "",
-        phone_number: "",
-      });
-      handleModal();
-    } else {
-      toast.error(
-        "Error al agregar usuario. Por favor verifique los datos, especialmente el correo, e intente nuevamente."
-      );
-      setFormUser({
-        email: "",
-        name: "",
-        phone_number: "",
-      });
+    try {
+      const userData = {
+        ...data,
+        phone_number: data.phone_number,
+      };
+
+      const validation = await AddUser(userData);
+      if (validation) {
+        toast.success("Usuario creado exitosamente");
+        getData();
+        setFormUser({
+          email: "",
+          name: "",
+          phone_number: "",
+        });
+        handleModal();
+      } else {
+        toast.error(
+          "Error al agregar usuario. Por favor verifique los datos, especialmente el correo, e intente nuevamente."
+        );
+        setFormUser({
+          email: "",
+          name: "",
+          phone_number: "",
+        });
+      }
+    } catch (error) {
+      toast.error(`Error: ${error}`);
+    } finally {
+      setIsSubmitting(false);
+      setIsValidationFinish(true);
     }
-    SetIsValidationFinish(true);
   }
 
   function handleSearchInput(e: React.ChangeEvent<HTMLInputElement>) {
@@ -129,19 +157,24 @@ export default function TableUsersController() {
   async function handleSearchUser() {
     setIsLoading(true);
 
-    const search = searchValue;
-    if (search === "") {
-      await getData();
-    } else {
-      const filteredUsers = await SearchUsers(search, 0, 100);
-      if (!filteredUsers) return;
-      if (filteredUsers.data) {
-        setUsersData(filteredUsers.data);
+    try {
+      const search = searchValue;
+      if (search === "") {
+        await getData();
       } else {
-        setUsersData([]);
+        const filteredUsers = await SearchUsers(search, offset, limit);
+        if (!filteredUsers) return;
+        if (filteredUsers.data) {
+          setUsersData(filteredUsers.data);
+        } else {
+          setUsersData([]);
+        }
       }
+    } catch (error) {
+      toast.error(`Error en la búsqueda: ${error}`);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   function handleFormUser(e: React.FormEvent<HTMLFormElement>) {
@@ -156,6 +189,7 @@ export default function TableUsersController() {
 
   async function confirmDelete() {
     if (!userToDelete) return;
+    setIsSubmitting(true);
 
     try {
       const result = await DeleteUser({
@@ -173,9 +207,11 @@ export default function TableUsersController() {
       }
     } catch (error) {
       toast.error(`Error: ${error}`);
+    } finally {
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
+      setIsSubmitting(false);
     }
-    setIsDeleteModalOpen(false);
-    setUserToDelete(null);
   }
 
   async function handleFormUpdateUser(user: User) {
@@ -195,7 +231,8 @@ export default function TableUsersController() {
 
   async function handleUpdateUser(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    SetIsValidationFinish(false);
+    setIsSubmitting(true);
+    setIsValidationFinish(false);
 
     try {
       const result = await UpdateUser(formUser);
@@ -208,284 +245,412 @@ export default function TableUsersController() {
       }
     } catch (error) {
       toast.error(`Error: ${error}`);
+    } finally {
+      setIsSubmitting(false);
+      setIsValidationFinish(true);
     }
+  }
 
-    SetIsValidationFinish(true);
+  async function handleActiveStateChange(user: User) {
+    setUserToChangeActive(user);
+    setIsActiveModalOpen(true);
+  }
+
+  async function confirmActiveChange() {
+    if (!userToChangeActive) return;
+    setIsSubmitting(true);
+
+    try {
+      const result = await ActiveChange(userToChangeActive);
+      if (result) {
+        if (result.success) {
+          toast.success(
+            `Se ha ${
+              userToChangeActive.active ? "desactivado" : "activado"
+            } el usuario ${userToChangeActive.name}`
+          );
+          await getData();
+        } else {
+          toast.error("Error al cambiar el estado del usuario");
+        }
+      } else {
+        toast.error("Error al cambiar el estado del usuario");
+      }
+    } catch (error) {
+      toast.error(`Error: ${error}`);
+    } finally {
+      setIsActiveModalOpen(false);
+      setUserToChangeActive(null);
+      setIsSubmitting(false);
+    }
   }
 
   return (
-    <section className="w-full h-10 flex flex-col justify-between items-start gap-5 px-5 py-5">
-      <div className="border-b-2 w-full pb-2">
-        <h1 className="text-2xl font-medium">Gestión de Usuarios</h1>
-        <p className="text-gray-600">
+    <section className="w-full flex flex-col gap-6 px-5 py-6 bg-gray-50">
+      <div className="border-b border-gray-200 pb-4">
+        <h1 className="text-2xl font-bold text-gray-900">
+          Gestión de Usuarios
+        </h1>
+        <p className="text-gray-600 mt-1">
           Administre usuarios, busque y añada nuevos usuarios al sistema.
         </p>
       </div>
-      <nav className="flex justify-between gap-5 w-full ">
-        <div className="inline-flex gap-1">
+
+      <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
+        <div className="relative flex items-center w-full md:w-auto">
           <input
             type="text"
-            className="border border-gray-300 p-2 rounded-md"
-            placeholder="Buscar en la tabla"
+            className="w-full md:w-80 pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+            placeholder="Buscar usuario por nombre, email..."
             onChange={handleSearchInput}
+            value={searchValue}
           />
-
+          <Search className="absolute left-3 text-gray-400 w-5 h-5" />
           <button
-            className="border border-gray-300 p-2 rounded-md cursor-pointer"
+            className="ml-2 px-4 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2"
             onClick={handleSearchUser}
+            disabled={isLoading}
           >
             Buscar
           </button>
         </div>
-        <div className="justify-center items-center flex gap-1">
-          <button
-            className="border border-gray-300 p-2 rounded-md cursor-pointer"
-            onClick={() => {
-              setPage((prev) => prev - 1);
-            }}
-          >
-            Atras
-          </button>
-          <div>
-            {page}/{Math.ceil(totalItems / limit)}
-          </div>
-          <button
-            className="border border-gray-300 p-2 rounded-md cursor-pointer"
-            onClick={() => {
-              setPage((prev) => prev + 1);
-            }}
-          >
-            Adelante
-          </button>
-        </div>
-        <button
-          className="border border-gray-300 rounded-md p-2 cursor-pointer inline-flex gap-2 justify-center items-center"
-          onClick={handleModal}
-        >
-          <span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1.2rem"
-              height="1.2rem"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <line x1="19" x2="19" y1="8" y2="14" />
-              <line x1="22" x2="16" y1="11" y2="11" />
-            </svg>
-          </span>
-          Agregar usuario
-        </button>
-      </nav>
 
-      <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center"
-        style={{
-          visibility: isModalOpen ? "visible" : "hidden",
-          zIndex: 10,
-        }}
-      >
-        <div className="bg-white p-6 rounded-lg w-96 relative">
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <div className="text-gray-600 text-sm whitespace-nowrap">
+            Mostrando {Math.min(limit, usersData.length)} de {totalItems}{" "}
+            usuarios
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              className="p-2 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={page < 1 || !isValidationFinish}
+              onClick={() => {
+                if (isValidationFinish) {
+                  setPage((prev) => prev - 1);
+                }
+              }}
+              aria-label="Página anterior"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <div className="text-sm font-medium">
+              {page + 1} / {totalPages || 1}
+            </div>
+
+            <button
+              className="p-2 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={page >= totalPages - 1 || !isValidationFinish}
+              onClick={() => {
+                if (isValidationFinish) {
+                  setPage((prev) => prev + 1);
+                }
+              }}
+              aria-label="Página siguiente"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+
           <button
-            className="absolute top-2 right-2 text-gray-500 hover:text-red-500 cursor-pointer "
+            className="w-full md:w-auto px-4 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2"
             onClick={handleModal}
-            disabled={!isValidationFinish}
-            style={{
-              cursor: isValidationFinish ? "pointer" : "not-allowed",
-            }}
           >
-            ✕
+            <UserPlus className="w-5 h-5" />
+            <span>Agregar usuario</span>
           </button>
-          <div className="mb-4">
-            <h2 className="text-xl font-bold">Crear nuevo usuario</h2>
-            <p className="text-gray-500">
-              Complete el siguiente formulario para crear un nuevo usuario
-            </p>
-          </div>
-          <form
-            className="flex flex-col justify-center items-start gap-2"
-            onSubmit={handleFormUser}
-          >
-            <label htmlFor="name" className="flex flex-col gap-2 w-full">
-              Nombre:
-              <input
-                onChange={handleForm}
-                value={formUser.name}
-                type="text"
-                required
-                id="name"
-                className="border border-gray-200 p-2 rounded-md"
-                placeholder="Ingrese nombre de usuario"
-              />
-            </label>
-            <label
-              htmlFor="phone_number"
-              className="flex flex-col gap-2 w-full"
-            >
-              Número de Teléfono:
-              <input
-                onChange={handleForm}
-                value={formUser.phone_number}
-                type="text"
-                required
-                id="phone_number"
-                className="border border-gray-200 p-2 rounded-md"
-                placeholder="Ingrese número de teléfono"
-              />
-            </label>
-            <label htmlFor="email" className="flex flex-col gap-2 w-full">
-              Correo:
-              <input
-                onChange={handleForm}
-                value={formUser.email}
-                required
-                type="email"
-                id="email"
-                className="border border-gray-200 p-2 rounded-md"
-                placeholder="Ingrese dirección de correo"
-              />
-            </label>
-            <button
-              type="submit"
-              style={{
-                cursor: isValidationFinish ? "pointer" : "not-allowed",
-              }}
-              disabled={!isValidationFinish}
-              className="border border-gray-400 w-full p-2 mt-5 rounded-md cursor-pointer"
-            >
-              Aceptar
-            </button>
-          </form>
         </div>
       </div>
 
-      <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center"
-        style={{
-          visibility: isUpdateModalOpen ? "visible" : "hidden",
-          zIndex: 10,
-        }}
-      >
-        <div className="bg-white p-6 rounded-lg w-96 relative">
-          <button
-            className="absolute top-2 right-2 text-gray-500 hover:text-red-500 cursor-pointer"
-            onClick={handleUpdateModal}
-            disabled={!isValidationFinish}
-            style={{
-              cursor: isValidationFinish ? "pointer" : "not-allowed",
-            }}
-          >
-            ✕
-          </button>
-          <div className="mb-4">
-            <h2 className="text-xl font-bold">Actualizar usuario</h2>
-            <p className="text-gray-500">
-              Edita los campos necesarios para validar la actualización
-            </p>
-          </div>
-          <form
-            className="flex flex-col justify-center items-start gap-2"
-            onSubmit={handleUpdateUser}
-          >
-            <label htmlFor="name" className="flex flex-col gap-2 w-full">
-              Nombre:
-              <input
-                onChange={handleForm}
-                value={formUser.name}
-                type="text"
-                required
-                id="name"
-                className="border border-gray-200 p-2 rounded-md"
-                placeholder="Ingrese nombre de usuario"
-              />
-            </label>
-            <label
-              htmlFor="phone_number"
-              className="flex flex-col gap-2 w-full"
-            >
-              Número de Teléfono:
-              <input
-                onChange={handleForm}
-                value={formUser.phone_number}
-                type="text"
-                required
-                id="phone_number"
-                className="border border-gray-200 p-2 rounded-md"
-                placeholder="Ingrese número de teléfono"
-              />
-            </label>
-            <label htmlFor="email" className="flex flex-col gap-2 w-full">
-              Correo:
-              <input
-                onChange={handleForm}
-                value={formUser.email}
-                required
-                type="email"
-                id="email"
-                className="border border-gray-200 p-2 rounded-md"
-                placeholder="Ingrese dirección de correo"
-              />
-            </label>
-            <button
-              type="submit"
-              style={{
-                cursor: isValidationFinish ? "pointer" : "not-allowed",
-              }}
-              disabled={!isValidationFinish}
-              className="border border-gray-400 w-full p-2 mt-5 rounded-md cursor-pointer"
-            >
-              Aceptar
-            </button>
-          </form>
-        </div>
-      </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Crear nuevo usuario
+                </h2>
+                <p className="text-gray-500 mt-1">
+                  Complete el siguiente formulario para crear un nuevo usuario
+                </p>
+              </div>
+              <button
+                className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 rounded-full p-1"
+                onClick={handleModal}
+                disabled={isSubmitting}
+                aria-label="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-      <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center"
-        style={{
-          visibility: isDeleteModalOpen ? "visible" : "hidden",
-          zIndex: 10,
-        }}
-      >
-        <div className="bg-white p-6 rounded-lg w-96 relative">
-          <div className="mb-4">
-            <h2 className="text-xl font-bold">Confirmar eliminación</h2>
-            <p className="text-gray-500 mt-2">
-              ¿Estás seguro que deseas eliminar al usuario {userToDelete?.name}?
-            </p>
-          </div>
-          <div className="flex justify-end gap-2 mt-4">
-            <button
-              onClick={() => setIsDeleteModalOpen(false)}
-              className="border border-gray-300 px-4 py-2 rounded-md cursor-pointer"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={confirmDelete}
-              className="bg-red-500 text-white px-4 py-2 rounded-md cursor-pointer"
-            >
-              Eliminar
-            </button>
+            <form className="p-6 space-y-4" onSubmit={handleFormUser}>
+              <div className="space-y-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Nombre
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={formUser.name}
+                  type="text"
+                  required
+                  id="name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese nombre de usuario"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="phone_number"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Número de Teléfono
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={formUser.phone_number}
+                  type="text"
+                  required
+                  id="phone_number"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese número de teléfono"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Correo
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={formUser.email}
+                  required
+                  type="email"
+                  id="email"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese dirección de correo"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-2.5 px-4 mt-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Procesando...
+                  </>
+                ) : (
+                  "Crear usuario"
+                )}
+              </button>
+            </form>
           </div>
         </div>
-      </div>
+      )}
 
-      <section className="w-full">
-        <TableUsers
-          loading={isloading}
-          data={usersData}
-          onDelete={handleDeleteUser}
-          onUpdate={handleFormUpdateUser}
-        />
-      </section>
-      <Toaster />
+      {isUpdateModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Actualizar usuario
+                </h2>
+                <p className="text-gray-500 mt-1">
+                  Edita los campos necesarios para validar la actualización
+                </p>
+              </div>
+              <button
+                className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 rounded-full p-1"
+                onClick={handleUpdateModal}
+                disabled={isSubmitting}
+                aria-label="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form className="p-6 space-y-4" onSubmit={handleUpdateUser}>
+              <div className="space-y-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Nombre
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={formUser.name}
+                  type="text"
+                  required
+                  id="name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese nombre de usuario"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="phone_number"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Número de Teléfono
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={formUser.phone_number}
+                  type="text"
+                  required
+                  id="phone_number"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese número de teléfono"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Correo
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={formUser.email}
+                  required
+                  type="email"
+                  id="email"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese dirección de correo"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-2.5 px-4 mt-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Procesando...
+                  </>
+                ) : (
+                  "Actualizar usuario"
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6">
+              <div className="mb-5">
+                <h2 className="text-xl font-bold text-gray-900">
+                  Confirmar eliminación
+                </h2>
+                <p className="text-gray-500 mt-2">
+                  ¿Estás seguro que deseas eliminar al usuario{" "}
+                  <span className="font-medium">{userToDelete?.name}</span>?
+                </p>
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Eliminando...
+                    </>
+                  ) : (
+                    "Eliminar"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isActiveChangeModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6">
+              <div className="mb-5">
+                <h2 className="text-xl font-bold text-gray-900">
+                  Confirmar cambio de estado
+                </h2>
+                <p className="text-gray-500 mt-2">
+                  ¿Estás seguro que deseas{" "}
+                  {userToChangeActive?.active ? "desactivar" : "activar"} al
+                  usuario{" "}
+                  <span className="font-medium">
+                    {userToChangeActive?.name}
+                  </span>
+                  ?
+                </p>
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => setIsActiveModalOpen(false)}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmActiveChange}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Procesando...
+                    </>
+                  ) : (
+                    "Aceptar"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <TableUsers
+        loading={isLoading}
+        data={usersData}
+        onDelete={handleDeleteUser}
+        onUpdate={handleFormUpdateUser}
+        onActive={handleActiveStateChange}
+      />
+
+      <Toaster position="bottom-right" closeButton />
     </section>
   );
 }
