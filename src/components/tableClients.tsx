@@ -1,27 +1,22 @@
-import type {User} from "../models/userModel";
+import type {client} from "../models/clientModel";
 import {
   UserX,
-  UserCog,
   CheckCircle,
   XCircle,
   Loader2,
+  Mail,
   MessageCircle,
   Phone,
-  Mail,
 } from "lucide-react";
 
-export default function TableUsers({
+export default function TableClient({
   data,
   loading,
   onDelete,
-  onUpdate,
-  onActive,
 }: {
-  data: User[];
+  data: client[];
   loading: boolean;
-  onDelete: (user: User) => void;
-  onUpdate: (user: User) => void;
-  onActive: (user: User) => void;
+  onDelete: (client: client) => void;
 }) {
   return (
     <section className="w-full mb-10">
@@ -45,7 +40,6 @@ export default function TableUsers({
                       <th className="px-6 py-4 font-medium">Nombre</th>
                       <th className="px-6 py-4 font-medium">Teléfono</th>
                       <th className="px-6 py-4 font-medium">Correo</th>
-                      <th className="px-6 py-4 font-medium">Rol</th>
                       <th className="px-6 py-4 font-medium">Estado</th>
                       <th className="px-6 py-4 font-medium">Acciones</th>
                     </tr>
@@ -67,9 +61,6 @@ export default function TableUsers({
                         </td>
                         <td className="px-6 py-4 text-gray-500">
                           {element.email}
-                        </td>
-                        <td className="px-6 py-4 text-gray-500">
-                          {element.role}
                         </td>
                         <td className="px-6 py-4">
                           <span
@@ -133,32 +124,6 @@ export default function TableUsers({
                             >
                               <UserX className="w-5 h-5" />
                             </button>
-                            <button
-                              onClick={() => onUpdate(element)}
-                              aria-label={`Actualizar usuario ${element.name}`}
-                              className="p-1.5 text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-                            >
-                              <UserCog className="w-5 h-5" />
-                            </button>
-                            <button
-                              onClick={() => onActive(element)}
-                              aria-label={
-                                element.active
-                                  ? `Desactivar usuario ${element.name}`
-                                  : `Activar usuario ${element.name}`
-                              }
-                              className={`p-1.5 rounded-md transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 ${
-                                element.active
-                                  ? "text-green-600 bg-green-50 hover:bg-green-100 focus:ring-green-500"
-                                  : "text-red-600 bg-red-50 hover:bg-red-100 focus:ring-red-500"
-                              }`}
-                            >
-                              {element.active ? (
-                                <CheckCircle className="w-5 h-5" />
-                              ) : (
-                                <XCircle className="w-5 h-5" />
-                              )}
-                            </button>
                           </div>
                         </td>
                       </tr>
@@ -171,9 +136,7 @@ export default function TableUsers({
                 <div className="mb-4 p-4 bg-gray-100 rounded-full">
                   <UserX className="w-8 h-8 text-gray-400" />
                 </div>
-                <p className="text-gray-500 mb-1">
-                  No se encontraron usuarios.
-                </p>
+                <p className="text-gray-500 mb-1">No se encontraro clientes.</p>
                 <p className="text-gray-400 text-sm">
                   Por favor intente más tarde o agregue un nuevo usuario.
                 </p>

@@ -1,17 +1,9 @@
-export interface User {
+export interface client {
   id: number;
   name: string;
   phone_number: string;
   email: string;
-  role: string;
   active: boolean;
-}
-
-export interface FormUser {
-  id?: number;
-  name: string;
-  phone_number: string;
-  email: string;
 }
 
 interface Metadata {
@@ -20,8 +12,8 @@ interface Metadata {
   total: number;
 }
 
-export interface responseUser {
-  data?: User[];
+export interface responseClient {
+  data?: client[];
   success: boolean;
   error?: string;
   metadata?: Metadata;

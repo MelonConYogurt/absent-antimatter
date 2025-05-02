@@ -10,6 +10,8 @@ import {
   X,
   Loader2,
 } from "lucide-react";
+import {PhoneInput} from "react-international-phone";
+import "react-international-phone/style.css";
 
 // Types
 import type {User, FormUser} from "../models/userModel";
@@ -20,7 +22,6 @@ import TableUsers from "./TableUsers";
 import DeleteUser from "@/utils/user/deleteUser";
 import UpdateUser from "@/utils/user/updateUser";
 import SearchUsers from "@/utils/user/searchUser";
-import getUsers from "@/utils/user/fetchUsers";
 import ActiveChange from "@/utils/user/aciveChange";
 
 export default function TableUsersController() {
@@ -56,34 +57,24 @@ export default function TableUsersController() {
   const totalPages = Math.ceil(totalItems / limit);
 
   useEffect(() => {
-    getData();
+    fetchUsers();
   }, [page]);
 
-  function handleForm(e: React.ChangeEvent<HTMLInputElement>) {
-    e.preventDefault();
-    setFormUser((prev) => ({...prev, [e.target.id]: e.target.value}));
-  }
-
-  function handleModal() {
-    setIsModalOpen((prev) => !prev);
-    if (!isModalOpen) {
-      setFormUser({
-        email: "",
-        name: "",
-        phone_number: "",
-      });
+  useEffect(() => {
+    if (searchValue === "") {
+      fetchUsers();
     }
-  }
+  }, [searchValue]);
 
-  function handleUpdateModal() {
-    setIsUpdateModalOpen((prev) => !prev);
-  }
-
-  async function getData() {
+  async function fetchUsers() {
     setIsLoading(true);
     setIsValidationFinish(false);
     try {
-      const data = await getUsers(offset, limit);
+      const data = await SearchUsers(
+        offset,
+        limit,
+        searchValue !== "" ? searchValue : null
+      );
       if (!data) return;
 
       if (data.data) {
@@ -108,6 +99,26 @@ export default function TableUsersController() {
     }
   }
 
+  function handleForm(e: React.ChangeEvent<HTMLInputElement>) {
+    e.preventDefault();
+    setFormUser((prev) => ({...prev, [e.target.id]: e.target.value}));
+  }
+
+  function handleModal() {
+    setIsModalOpen((prev) => !prev);
+    if (!isModalOpen) {
+      setFormUser({
+        email: "",
+        name: "",
+        phone_number: "",
+      });
+    }
+  }
+
+  function handleUpdateModal() {
+    setIsUpdateModalOpen((prev) => !prev);
+  }
+
   async function handleAddUser(data: FormUser) {
     setIsSubmitting(true);
     setIsValidationFinish(false);
@@ -121,7 +132,7 @@ export default function TableUsersController() {
       const validation = await AddUser(userData);
       if (validation) {
         toast.success("Usuario creado exitosamente");
-        getData();
+        fetchUsers();
         setFormUser({
           email: "",
           name: "",
@@ -149,27 +160,13 @@ export default function TableUsersController() {
   function handleSearchInput(e: React.ChangeEvent<HTMLInputElement>) {
     const search = e.target.value;
     setSearchValue(search);
-    if (search === "") {
-      getData();
-    }
   }
 
   async function handleSearchUser() {
     setIsLoading(true);
 
     try {
-      const search = searchValue;
-      if (search === "") {
-        await getData();
-      } else {
-        const filteredUsers = await SearchUsers(search, offset, limit);
-        if (!filteredUsers) return;
-        if (filteredUsers.data) {
-          setUsersData(filteredUsers.data);
-        } else {
-          setUsersData([]);
-        }
-      }
+      await fetchUsers();
     } catch (error) {
       toast.error(`Error en la búsqueda: ${error}`);
     } finally {
@@ -201,7 +198,7 @@ export default function TableUsersController() {
 
       if (result) {
         toast.success("Usuario eliminado correctamente");
-        await getData();
+        await fetchUsers();
       } else {
         toast.error("Error al eliminar el usuario");
       }
@@ -238,7 +235,7 @@ export default function TableUsersController() {
       const result = await UpdateUser(formUser);
       if (result) {
         toast.success("Usuario actualizado correctamente");
-        await getData();
+        await fetchUsers();
         handleUpdateModal();
       } else {
         toast.error("Error al actualizar el usuario");
@@ -269,7 +266,7 @@ export default function TableUsersController() {
               userToChangeActive.active ? "desactivado" : "activado"
             } el usuario ${userToChangeActive.name}`
           );
-          await getData();
+          await fetchUsers();
         } else {
           toast.error("Error al cambiar el estado del usuario");
         }
@@ -282,6 +279,18 @@ export default function TableUsersController() {
       setIsActiveModalOpen(false);
       setUserToChangeActive(null);
       setIsSubmitting(false);
+    }
+  }
+
+  function handlePageUp() {
+    if (isValidationFinish) {
+      setPage((prev) => prev + 1);
+    }
+  }
+
+  function handlePageDown() {
+    if (isValidationFinish) {
+      setPage((prev) => prev - 1);
     }
   }
 
@@ -325,11 +334,7 @@ export default function TableUsersController() {
             <button
               className="p-2 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={page < 1 || !isValidationFinish}
-              onClick={() => {
-                if (isValidationFinish) {
-                  setPage((prev) => prev - 1);
-                }
-              }}
+              onClick={handlePageDown}
               aria-label="Página anterior"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -342,11 +347,7 @@ export default function TableUsersController() {
             <button
               className="p-2 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={page >= totalPages - 1 || !isValidationFinish}
-              onClick={() => {
-                if (isValidationFinish) {
-                  setPage((prev) => prev + 1);
-                }
-              }}
+              onClick={handlePageUp}
               aria-label="Página siguiente"
             >
               <ChevronRight className="w-5 h-5" />
@@ -411,14 +412,14 @@ export default function TableUsersController() {
                 >
                   Número de Teléfono
                 </label>
-                <input
-                  onChange={handleForm}
+                <PhoneInput
+                  defaultCountry="ua"
                   value={formUser.phone_number}
-                  type="text"
+                  onChange={(phone) =>
+                    setFormUser((prev) => ({...prev, phone_number: phone}))
+                  }
+                  inputClassName="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                   required
-                  id="phone_number"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
-                  placeholder="Ingrese número de teléfono"
                 />
               </div>
 

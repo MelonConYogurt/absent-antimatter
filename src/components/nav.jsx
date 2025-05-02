@@ -9,8 +9,11 @@ function Nav() {
 
   return (
     <>
-      <nav class="hidden w-full h-13 md:flex flex-row justify-end items-center gap-8  border-b border-gray-300 px-5">
-        <a href="/" class="inline-flex gap-2 justify-center items-center">
+      <nav class="hidden w-full h-13 md:flex flex-row justify-end items-center font-medium gap-8  border-b border-gray-300 bg-gray-800 text-white px-5">
+        <a
+          href="/"
+          class="inline-flex gap-2 justify-center items-center font-medium "
+        >
           <span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +35,10 @@ function Nav() {
           </span>
           Dashboard
         </a>
-        <a href="/users" class="inline-flex gap-2 justify-center items-center">
+        <a
+          href="/users"
+          class="inline-flex gap-2 justify-center items-center font-medium"
+        >
           <span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -55,7 +61,7 @@ function Nav() {
         </a>
         <a
           href="/clients"
-          class="inline-flex gap-2 justify-center items-center"
+          class="inline-flex gap-2 justify-center items-center font-medium"
         >
           <span>
             <svg
@@ -80,7 +86,7 @@ function Nav() {
         </a>
         <a
           href="/products"
-          class="inline-flex gap-2 justify-center items-center"
+          class="inline-flex gap-2 justify-center items-center font-medium"
         >
           <span>
             <svg
@@ -103,7 +109,10 @@ function Nav() {
           </span>
           Productos
         </a>
-        <a href="/sales" class="inline-flex gap-2 justify-center items-center">
+        <a
+          href="/sales"
+          class="inline-flex gap-2 justify-center items-center font-medium"
+        >
           <span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -126,33 +135,12 @@ function Nav() {
           </span>
           Ventas
         </a>
-        <a href="/config" class="inline-flex gap-2 justify-center items-center">
-          <span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1.2rem"
-              height="1.2rem"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-menu-icon lucide-menu"
-            >
-              <line x1="4" x2="20" y1="12" y2="12"></line>
-              <line x1="4" x2="20" y1="6" y2="6"></line>
-              <line x1="4" x2="20" y1="18" y2="18"></line>
-            </svg>
-          </span>
-          Configuración
-        </a>
       </nav>
 
-      <nav class="md:hidden w-full h-13 flex justify-end items-center gap-8 border-b border-gray-300 px-5">
+      <nav class="md:hidden w-full h-13 flex justify-end items-center font-medium gap-8 border-b border-gray-300  bg-gray-800 text-white px-5">
         <button
           onClick={handleMenu}
-          class="inline-flex gap-2 justify-center items-center"
+          class="inline-flex gap-2 justify-center items-center font-medium"
         >
           <span>
             <svg
@@ -174,8 +162,11 @@ function Nav() {
           </span>
         </button>
         {isMenuOpen && (
-          <div className="absolute top-13 right-0 bg-white w-64 border border-gray-300 shadow-lg">
-            <a href="/" class=" px-4 py-2 hover:bg-gray-100 items-center gap-2">
+          <div className="absolute top-13 z-50 right-0 w-64 border border-gray-300 shadow-lg bg-gray-800 text-white rounded-md">
+            <a
+              href="/"
+              class=" px-4 py-2 hover:bg-gray-700 flex items-center font-medium gap-2"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="1.2rem"
@@ -197,7 +188,7 @@ function Nav() {
             </a>
             <a
               href="/users"
-              class="px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+              class="px-4 py-2 hover:bg-gray-700 flex items-center font-medium gap-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -219,7 +210,7 @@ function Nav() {
             </a>
             <a
               href="/clients"
-              class=" px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+              class=" px-4 py-2 hover:bg-gray-700 flex items-center font-medium gap-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -242,7 +233,7 @@ function Nav() {
             </a>
             <a
               href="/products"
-              class=" px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+              class=" px-4 py-2 hover:bg-gray-700 flex items-center font-medium gap-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -265,7 +256,7 @@ function Nav() {
             </a>
             <a
               href="/sales"
-              class=" px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+              class=" px-4 py-2 hover:bg-gray-700 flex items-center font-medium gap-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -286,27 +277,6 @@ function Nav() {
                 <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path>
               </svg>
               Ventas
-            </a>
-            <a
-              href="/config"
-              class=" px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="1.2rem"
-                height="1.2rem"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-settings"
-              >
-                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1-1-1.73l-.43-.25a2 2 0 0 1-2 0l-.15.08a2 2 0 0 0-2.73-.73l-.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-              Configuración
             </a>
           </div>
         )}

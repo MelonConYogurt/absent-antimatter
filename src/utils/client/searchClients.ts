@@ -1,20 +1,19 @@
-import type {responseUser} from "@/models/userModel";
+import type {responseClient} from "../../models/clientModel";
 
-export default async function SearchUsers(
+export default async function SearchClients(
   offset: number,
   limit: number,
   search: string | null = null
-): Promise<responseUser | false> {
+): Promise<responseClient | false> {
   try {
-    console.log("Offset:", offset, "Limit:", limit, "Search:", search);
     const params = new URLSearchParams();
     if (search) {
-      params.append("search", search);
+      params.append("search_value", search);
     }
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 
-    const url = `http://localhost:8000/users/search/?${params.toString()}`;
+    const url = `http://localhost:8000/clients/search/?${params.toString()}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -24,7 +23,7 @@ export default async function SearchUsers(
     });
 
     if (response.ok) {
-      return response.json() as Promise<responseUser>;
+      return response.json() as Promise<responseClient>;
     } else {
       console.error("Error en la respuesta del servidor:", response.status);
       return false;
