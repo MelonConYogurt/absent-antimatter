@@ -1,0 +1,11 @@
+---
+import "../styles/global.css";
+import Layout from "../layouts/Layout.astro";
+import Nav from "@/components/nav";
+import TableProductsController from "../components/TableProductsController";
+---
+
+<Layout>
+  <Nav />
+  <TableProductsController client:load />
+</Layout>
