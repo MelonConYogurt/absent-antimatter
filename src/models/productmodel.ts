@@ -6,7 +6,7 @@ export interface Product {
   category_id: number;
   price: number;
   created_at: string;
-  supplier: string;
+  supplier_id: string;
   active: boolean;
 }
 

@@ -1,13 +1,13 @@
 import type {Product} from "../models/productmodel";
+import {useState} from "react";
 import {
-  UserX,
-  UserCog,
   CheckCircle,
   XCircle,
   Loader2,
   Edit,
   Trash,
   Package,
+  ArrowDownUp,
 } from "lucide-react";
 
 export default function TableProducts({
@@ -16,13 +16,25 @@ export default function TableProducts({
   onDelete,
   onUpdate,
   onActive,
+  OnColumOrder,
 }: {
   data: Product[];
   loading: boolean;
+  OnColumOrder: (col: string, orderDirection: string) => void;
   onDelete: (product: Product) => void;
   onUpdate: (product: Product) => void;
   onActive: (product: Product) => void;
 }) {
+  const [idDirection, setIdDirection] = useState(false);
+  const [nameDirection, setNameDirection] = useState(false);
+  const [stockDirection, setStockDirection] = useState(false);
+  const [referenceDirection, setReferenceDirection] = useState(false);
+  const [categoryDirection, setCategoryDirection] = useState(false);
+  const [priceDirection, setPriceDirection] = useState(false);
+  const [createdAtDirection, setCreatedAtDirection] = useState(false);
+  const [supplierDirection, setSupplierDirection] = useState(false);
+  const [activeDirection, setActiveDirection] = useState(false);
+
   return (
     <section className="w-full mb-10">
       <div className="w-full overflow-hidden border border-gray-200 rounded-lg shadow-md bg-white">
@@ -41,15 +53,156 @@ export default function TableProducts({
                 <table className="w-full text-sm text-left">
                   <thead className="text-xs uppercase bg-gray-800 text-white">
                     <tr>
-                      <th className="px-6 py-4 font-medium">Id</th>
-                      <th className="px-6 py-4 font-medium">Nombre</th>
-                      <th className="px-6 py-4 font-medium">Stock</th>
-                      <th className="px-6 py-4 font-medium">Referencia</th>
-                      <th className="px-6 py-4 font-medium">Categoría</th>
-                      <th className="px-6 py-4 font-medium">Precio</th>
-                      <th className="px-6 py-4 font-medium">Fecha de alta</th>
-                      <th className="px-6 py-4 font-medium">Proveedor</th>
-                      <th className="px-6 py-4 font-medium">Estado</th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Id</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIdDirection((prev) => !prev);
+                              OnColumOrder("id", idDirection ? "ASC" : "DESC");
+                            }}
+                          >
+                            <ArrowDownUp className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Nombre</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNameDirection((prev) => !prev);
+                              OnColumOrder(
+                                "name",
+                                nameDirection ? "ASC" : "DESC"
+                              );
+                            }}
+                          >
+                            <ArrowDownUp className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Stock</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setStockDirection((prev) => !prev);
+                              OnColumOrder(
+                                "stock",
+                                stockDirection ? "ASC" : "DESC"
+                              );
+                            }}
+                          >
+                            <ArrowDownUp className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Referencia</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReferenceDirection((prev) => !prev);
+                              OnColumOrder(
+                                "reference",
+                                referenceDirection ? "ASC" : "DESC"
+                              );
+                            }}
+                          >
+                            <ArrowDownUp className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Categoría</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCategoryDirection((prev) => !prev);
+                              OnColumOrder(
+                                "category_id",
+                                categoryDirection ? "ASC" : "DESC"
+                              );
+                            }}
+                          >
+                            <ArrowDownUp className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Precio</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPriceDirection((prev) => !prev);
+                              OnColumOrder(
+                                "price",
+                                priceDirection ? "ASC" : "DESC"
+                              );
+                            }}
+                          >
+                            <ArrowDownUp className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Fecha de alta</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCreatedAtDirection((prev) => !prev);
+                              OnColumOrder(
+                                "created_at",
+                                createdAtDirection ? "ASC" : "DESC"
+                              );
+                            }}
+                          >
+                            <ArrowDownUp className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Proveedor</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSupplierDirection((prev) => !prev);
+                              OnColumOrder(
+                                "supplier_id",
+                                supplierDirection ? "ASC" : "DESC"
+                              );
+                            }}
+                          >
+                            <ArrowDownUp className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Estado</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveDirection((prev) => !prev);
+                              OnColumOrder(
+                                "active",
+                                activeDirection ? "ASC" : "DESC"
+                              );
+                            }}
+                          >
+                            <ArrowDownUp className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </th>
                       <th className="px-6 py-4 font-medium">Acciones</th>
                     </tr>
                   </thead>
@@ -81,7 +234,7 @@ export default function TableProducts({
                           {element.created_at}
                         </td>
                         <td className="px-6 py-4 text-gray-500">
-                          {element.supplier}
+                          {element.supplier_id}
                         </td>
                         <td className="px-6 py-4">
                           <span

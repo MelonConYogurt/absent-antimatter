@@ -13,22 +13,23 @@ export default function TableProductsController() {
   const [searchValue, setSearchValue] = useState("");
   const [totalProducts, setTotalProducts] = useState(0);
   const [page, setPage] = useState(0);
-  const [orderDirection, setOrderDirection] = useState("");
+  const [orderDirection, setOrderDirection] = useState<string | undefined>();
+  const [column, setColumn] = useState<string | undefined>();
 
   useEffect(() => {
-    GetProducts();
-  }, []);
+    if (searchValue === "") {
+      GetProducts();
+    }
+  }, [offset, searchValue, column, orderDirection]);
 
   async function GetProducts() {
     try {
       setLoading(true);
-      // if(searchValue !== ''){
-      //   let response = await SearchProducts(offset, limit, searchValue, )
-      // }
       let response = await SearchProducts(
         offset,
         limit,
         searchValue ? searchValue : null,
+        column ? column : null,
         orderDirection ? orderDirection : null
       );
       console.log("Respuesta de API:", response);
@@ -78,15 +79,19 @@ export default function TableProductsController() {
     setOffset((prev) => prev - limit);
   }
 
+  function handleColumOrder(col: string, colDirection: string) {
+    setColumn(col);
+    setOrderDirection(colDirection);
+    console.log(`Col: ${col}, direction: ${colDirection}`);
+  }
+
   return (
     <section className="w-full flex flex-col gap-6 px-5 py-6 bg-gray-50">
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">
-          Gestión de clientes
+          Gestión de Productos
         </h1>
-        <p className="text-gray-600 mt-1">
-          Administre clientes, busque o elimine clientes.
-        </p>
+        <p className="text-gray-600 mt-1">Administre.</p>
       </div>
 
       <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
@@ -151,6 +156,7 @@ export default function TableProductsController() {
         onActive={handleActive}
         onDelete={HandleDelete}
         onUpdate={HandleUpdate}
+        OnColumOrder={handleColumOrder}
       />
       <Toaster />
     </section>

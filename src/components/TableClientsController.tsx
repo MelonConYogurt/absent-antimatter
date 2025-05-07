@@ -5,14 +5,7 @@ import TableClient from "./tableClients";
 import DeleteClient from "@/utils/client/deleteClient";
 import {Toaster, toast} from "sonner";
 
-import {
-  Search,
-  UserPlus,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  Loader2,
-} from "lucide-react";
+import {Search, ChevronLeft, ChevronRight, X, Loader2} from "lucide-react";
 
 export default function TableClientController() {
   const [Data, setData] = useState<client[]>([]);
