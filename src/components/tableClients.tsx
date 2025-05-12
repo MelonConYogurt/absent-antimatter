@@ -7,17 +7,27 @@ import {
   Mail,
   MessageCircle,
   Phone,
+  ArrowDownUp,
 } from "lucide-react";
+import {useState} from "react";
 
 export default function TableClient({
   data,
   loading,
   onDelete,
+  onColumnOrder,
 }: {
   data: client[];
   loading: boolean;
   onDelete: (client: client) => void;
+  onColumnOrder?: (col: string, orderDirection: string) => void;
 }) {
+  const [idDirection, setIdDirection] = useState(false);
+  const [nameDirection, setNameDirection] = useState(false);
+  const [phoneDirection, setPhoneDirection] = useState(false);
+  const [emailDirection, setEmailDirection] = useState(false);
+  const [activeDirection, setActiveDirection] = useState(false);
+
   return (
     <section className="w-full mb-10">
       <div className="w-full overflow-hidden border border-gray-200 rounded-lg shadow-md bg-white">
@@ -36,11 +46,101 @@ export default function TableClient({
                 <table className="w-full text-sm text-left">
                   <thead className="text-xs uppercase bg-gray-800 text-white">
                     <tr>
-                      <th className="px-6 py-4 font-medium">Id</th>
-                      <th className="px-6 py-4 font-medium">Nombre</th>
-                      <th className="px-6 py-4 font-medium">Teléfono</th>
-                      <th className="px-6 py-4 font-medium">Correo</th>
-                      <th className="px-6 py-4 font-medium">Estado</th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Id</p>
+                          {onColumnOrder && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIdDirection((prev) => !prev);
+                                onColumnOrder(
+                                  "id",
+                                  idDirection ? "ASC" : "DESC"
+                                );
+                              }}
+                            >
+                              <ArrowDownUp className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Nombre</p>
+                          {onColumnOrder && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNameDirection((prev) => !prev);
+                                onColumnOrder(
+                                  "name",
+                                  nameDirection ? "ASC" : "DESC"
+                                );
+                              }}
+                            >
+                              <ArrowDownUp className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Teléfono</p>
+                          {onColumnOrder && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPhoneDirection((prev) => !prev);
+                                onColumnOrder(
+                                  "phone_number",
+                                  phoneDirection ? "ASC" : "DESC"
+                                );
+                              }}
+                            >
+                              <ArrowDownUp className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Correo</p>
+                          {onColumnOrder && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEmailDirection((prev) => !prev);
+                                onColumnOrder(
+                                  "email",
+                                  emailDirection ? "ASC" : "DESC"
+                                );
+                              }}
+                            >
+                              <ArrowDownUp className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 font-medium">
+                        <div className="inline-flex justify-between items-center gap-2 ">
+                          <p>Estado</p>
+                          {onColumnOrder && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveDirection((prev) => !prev);
+                                onColumnOrder(
+                                  "active",
+                                  activeDirection ? "ASC" : "DESC"
+                                );
+                              }}
+                            >
+                              <ArrowDownUp className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      </th>
                       <th className="px-6 py-4 font-medium">Acciones</th>
                     </tr>
                   </thead>

@@ -43,6 +43,8 @@ export default function TableUsersController() {
     phone_number: "",
   });
   const [searchValue, setSearchValue] = useState("");
+  const [orderDirection, setOrderDirection] = useState<string | undefined>();
+  const [column, setColumn] = useState<string | undefined>();
 
   // Loading and Validation States
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +60,7 @@ export default function TableUsersController() {
 
   useEffect(() => {
     fetchUsers();
-  }, [page]);
+  }, [page, column, orderDirection]);
 
   useEffect(() => {
     if (searchValue === "") {
@@ -73,7 +75,9 @@ export default function TableUsersController() {
       const data = await SearchUsers(
         offset,
         limit,
-        searchValue !== "" ? searchValue : null
+        searchValue !== "" ? searchValue : null,
+        column ? column : null,
+        orderDirection ? orderDirection : null
       );
       if (!data) return;
 
@@ -160,6 +164,15 @@ export default function TableUsersController() {
   function handleSearchInput(e: React.ChangeEvent<HTMLInputElement>) {
     const search = e.target.value;
     setSearchValue(search);
+  }
+
+  function handleSearchReset() {
+    setSearchValue("");
+  }
+
+  function handleColumnOrder(col: string, colDirection: string) {
+    setColumn(col);
+    setOrderDirection(colDirection);
   }
 
   async function handleSearchUser() {
@@ -307,20 +320,34 @@ export default function TableUsersController() {
 
       <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
         <div className="relative flex items-center w-full md:w-auto">
-          <input
-            type="text"
-            className="w-full md:w-80 pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
-            placeholder="Buscar usuario por nombre, email..."
-            onChange={handleSearchInput}
-            value={searchValue}
-          />
-          <Search className="absolute left-3 text-gray-400 w-5 h-5" />
+          <div className="flex items-center justify-center gap-2 border border-gray-300 rounded-md p-2.5">
+            <Search className="text-gray-400 w-5 h-5 cursor-pointer" />
+            <input
+              type="text"
+              placeholder="Buscar usuario por nombre, email..."
+              className="w-full px-2 outline-none border-none text-sm text-gray-700 placeholder-gray-400"
+              onChange={handleSearchInput}
+              disabled={isLoading}
+              value={searchValue}
+            />
+            <X
+              className="text-red-400 w-5 h-5 cursor-pointer"
+              onClick={handleSearchReset}
+            />
+          </div>
           <button
-            className="ml-2 px-4 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2"
+            className="ml-2 px-4 py-2.5 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
             onClick={handleSearchUser}
             disabled={isLoading}
           >
-            Buscar
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Buscando...
+              </>
+            ) : (
+              "Buscar"
+            )}
           </button>
         </div>
 
@@ -355,7 +382,7 @@ export default function TableUsersController() {
           </div>
 
           <button
-            className="w-full md:w-auto px-4 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2"
+            className="w-full md:w-auto px-4 py-2.5 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors duration-150 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2"
             onClick={handleModal}
           >
             <UserPlus className="w-5 h-5" />
@@ -366,7 +393,7 @@ export default function TableUsersController() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">
@@ -444,7 +471,7 @@ export default function TableUsersController() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2.5 px-4 mt-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full py-2.5 px-4 mt-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isSubmitting ? (
                   <>
@@ -462,7 +489,7 @@ export default function TableUsersController() {
 
       {isUpdateModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">
@@ -540,7 +567,7 @@ export default function TableUsersController() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2.5 px-4 mt-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full py-2.5 px-4 mt-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isSubmitting ? (
                   <>
@@ -558,7 +585,7 @@ export default function TableUsersController() {
 
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="p-6">
               <div className="mb-5">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -573,14 +600,14 @@ export default function TableUsersController() {
                 <button
                   onClick={() => setIsDeleteModalOpen(false)}
                   disabled={isSubmitting}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmDelete}
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
                 >
                   {isSubmitting ? (
                     <>
@@ -599,7 +626,7 @@ export default function TableUsersController() {
 
       {isActiveChangeModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="p-6">
               <div className="mb-5">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -619,14 +646,14 @@ export default function TableUsersController() {
                 <button
                   onClick={() => setIsActiveModalOpen(false)}
                   disabled={isSubmitting}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmActiveChange}
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
+                  className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
                 >
                   {isSubmitting ? (
                     <>
@@ -649,6 +676,7 @@ export default function TableUsersController() {
         onDelete={handleDeleteUser}
         onUpdate={handleFormUpdateUser}
         onActive={handleActiveStateChange}
+        onColumnOrder={handleColumnOrder}
       />
 
       <Toaster position="bottom-right" closeButton />

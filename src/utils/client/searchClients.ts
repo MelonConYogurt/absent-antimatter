@@ -3,13 +3,23 @@ import type {responseClient} from "../../models/clientModel";
 export default async function SearchClients(
   offset: number,
   limit: number,
-  search: string | null = null
+  search: string | null = null,
+  column: string | null = null,
+  order_direction: string | null = null
 ): Promise<responseClient | false> {
   try {
     const params = new URLSearchParams();
+
     if (search) {
       params.append("search_value", search);
     }
+    if (column) {
+      params.append("column", column);
+    }
+    if (order_direction) {
+      params.append("order_direction", order_direction);
+    }
+
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 

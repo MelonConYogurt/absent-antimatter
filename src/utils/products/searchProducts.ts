@@ -29,11 +29,7 @@ export default async function SearchProducts(
       headers: {
         "Content-Type": "application/json",
       },
-      // Añadir un timeout razonable
-      signal: AbortSignal.timeout(10000),
     });
-
-    console.log("Estado de la respuesta:", response.status);
 
     if (response.ok) {
       const data = await response.json();

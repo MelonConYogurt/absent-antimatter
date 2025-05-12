@@ -3,7 +3,7 @@ import {useState, useEffect} from "react";
 import {Toaster, toast} from "sonner";
 import type {Product} from "@/models/productmodel";
 import SearchProducts from "@/utils/products/searchProducts";
-import {ChevronLeft, ChevronRight, Loader2, Search} from "lucide-react";
+import {ChevronLeft, ChevronRight, Loader2, Search, X} from "lucide-react";
 
 export default function TableProductsController() {
   const [loading, setLoading] = useState(false);
@@ -17,10 +17,14 @@ export default function TableProductsController() {
   const [column, setColumn] = useState<string | undefined>();
 
   useEffect(() => {
+    GetProducts();
+  }, [offset, column, orderDirection]);
+
+  useEffect(() => {
     if (searchValue === "") {
       GetProducts();
     }
-  }, [offset, searchValue, column, orderDirection]);
+  }, [searchValue]);
 
   async function GetProducts() {
     try {
@@ -85,6 +89,10 @@ export default function TableProductsController() {
     console.log(`Col: ${col}, direction: ${colDirection}`);
   }
 
+  function handleSearchReset() {
+    setSearchValue("");
+  }
+
   return (
     <section className="w-full flex flex-col gap-6 px-5 py-6 bg-gray-50">
       <div className="border-b border-gray-200 pb-4">
@@ -96,16 +104,23 @@ export default function TableProductsController() {
 
       <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
         <div className="relative flex items-center w-full md:w-auto">
-          <input
-            type="text"
-            className="w-full md:w-80 pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
-            placeholder="Buscar cliente por nombre, email..."
-            onChange={handleChangeSearInput}
-            disabled={loading}
-          />
-          <Search className="absolute left-3 text-gray-400 w-5 h-5" />
+          <div className="flex items-center justify-center gap-2 border border-gray-300 rounded-md p-2.5">
+            <Search className=" text-gray-400 w-5 h-5 cursor-pointer" />
+            <input
+              type="text"
+              placeholder="Buscar cliente por nombre, email..."
+              className="w-full px-2 outline-none border-none text-sm text-gray-700 placeholder-gray-400"
+              onChange={handleChangeSearInput}
+              disabled={loading}
+              value={searchValue}
+            />
+            <X
+              className=" text-red-400 w-5 h-5 cursor-pointer"
+              onClick={handleSearchReset}
+            />
+          </div>
           <button
-            className="ml-2 px-4 py-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
+            className="ml-2 px-4 py-2.5 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
             onClick={GetProducts}
             disabled={loading}
           >
