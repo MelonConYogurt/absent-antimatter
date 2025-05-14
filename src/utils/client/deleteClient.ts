@@ -6,7 +6,7 @@ export default async function DeleteClient(
   try {
     console.log("Eliminando cliente con ID:", id);
 
-    const url = `http://localhost:8000/clients/toggle-active/?id=${id}`;
+    const url = `http://localhost:8000/clients/toggle-active-state/?id=${id}`;
 
     const response = await fetch(url, {
       method: "PATCH",

@@ -1,4 +1,3 @@
-// Imports
 import type React from "react";
 import {useState, useEffect} from "react";
 import {Toaster, toast} from "sonner";
@@ -12,11 +11,7 @@ import {
 } from "lucide-react";
 import {PhoneInput} from "react-international-phone";
 import "react-international-phone/style.css";
-
-// Types
 import type {User, FormUser} from "../models/userModel";
-
-// Api functions
 import AddUser from "../utils/user/addUser";
 import TableUsers from "./TableUsers";
 import DeleteUser from "@/utils/user/deleteUser";
@@ -25,13 +20,10 @@ import SearchUsers from "@/utils/user/searchUser";
 import ActiveChange from "@/utils/user/aciveChange";
 
 export default function TableUsersController() {
-  // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isActiveChangeModalOpen, setIsActiveModalOpen] = useState(false);
-
-  // Data
   const [usersData, setUsersData] = useState<User[]>([]);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [userToChangeActive, setUserToChangeActive] = useState<User | null>(
@@ -45,13 +37,9 @@ export default function TableUsersController() {
   const [searchValue, setSearchValue] = useState("");
   const [orderDirection, setOrderDirection] = useState<string | undefined>();
   const [column, setColumn] = useState<string | undefined>();
-
-  // Loading and Validation States
   const [isLoading, setIsLoading] = useState(false);
   const [isValidationFinish, setIsValidationFinish] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Pagination
   const [page, setPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const limit = 20;
@@ -162,8 +150,7 @@ export default function TableUsersController() {
   }
 
   function handleSearchInput(e: React.ChangeEvent<HTMLInputElement>) {
-    const search = e.target.value;
-    setSearchValue(search);
+    setSearchValue(e.target.value);
   }
 
   function handleSearchReset() {

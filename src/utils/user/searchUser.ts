@@ -3,18 +3,28 @@ import type {responseUser} from "@/models/userModel";
 export default async function SearchUsers(
   offset: number,
   limit: number,
-  search: string | null = null
+  search: string | null = null,
+  column: string | null = null,
+  order_direction: string | null = null
 ): Promise<responseUser | false> {
   try {
     console.log("Offset:", offset, "Limit:", limit, "Search:", search);
     const params = new URLSearchParams();
+
     if (search) {
-      params.append("search", search);
+      params.append("search_value", search);
     }
+    if (column) {
+      params.append("column", column);
+    }
+    if (order_direction) {
+      params.append("order_direction", order_direction);
+    }
+
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 
-    const url = `http://localhost:8000/users/search/?${params.toString()}`;
+    const url = `http://localhost:8000/users/list-filtered/?${params.toString()}`;
 
     const response = await fetch(url, {
       method: "GET",

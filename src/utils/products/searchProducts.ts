@@ -9,6 +9,7 @@ export default async function SearchProducts(
 ): Promise<responseProducts | false> {
   try {
     const params = new URLSearchParams();
+
     if (search) {
       params.append("search_value", search);
     }
