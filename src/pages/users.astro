@@ -1,11 +1,9 @@
 ---
 import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
-import Nav from "@/components/nav";
 import TableUsersController from "../components/TableUsersControllers";
 ---
 
 <Layout>
-  <Nav client:load />
   <TableUsersController client:load />
 </Layout>

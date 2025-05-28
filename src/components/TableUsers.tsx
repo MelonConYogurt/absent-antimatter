@@ -247,25 +247,18 @@ export default function TableUsers({
                             </a>
                             <button
                               onClick={() => onDelete(element)}
-                              aria-label={`Eliminar usuario ${element.name}`}
                               className="p-1.5 text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                             >
                               <UserX className="w-5 h-5" />
                             </button>
                             <button
                               onClick={() => onUpdate(element)}
-                              aria-label={`Actualizar usuario ${element.name}`}
                               className="p-1.5 text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                             >
                               <UserCog className="w-5 h-5" />
                             </button>
                             <button
                               onClick={() => onActive(element)}
-                              aria-label={
-                                element.active
-                                  ? `Desactivar usuario ${element.name}`
-                                  : `Activar usuario ${element.name}`
-                              }
                               className={`p-1.5 rounded-md transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 ${
                                 element.active
                                   ? "text-green-600 bg-green-50 hover:bg-green-100 focus:ring-green-500"

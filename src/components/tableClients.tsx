@@ -219,7 +219,6 @@ export default function TableClient({
                             </a>
                             <button
                               onClick={() => onDelete(element)}
-                              aria-label={`Eliminar usuario ${element.name}`}
                               className="p-1.5 text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                             >
                               <UserX className="w-5 h-5" />

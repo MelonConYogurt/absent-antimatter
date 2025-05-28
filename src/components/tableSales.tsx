@@ -1,5 +1,5 @@
 import type {Sale} from "../models/saleModel";
-import {UserX, UserCog, Loader2, ArrowDownUp} from "lucide-react";
+import {UserX, UserCog, Loader2, ArrowDownUp, Edit, Trash} from "lucide-react";
 import {useState} from "react";
 
 export default function TableSales({
@@ -163,17 +163,15 @@ export default function TableSales({
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => onDelete(element)}
-                              aria-label={`Eliminar usuario ${element.id}`}
                               className="p-1.5 text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                             >
-                              <UserX className="w-5 h-5" />
+                              <Trash className="w-5 h-5" />
                             </button>
                             <button
                               onClick={() => onUpdate(element)}
-                              aria-label={`Actualizar usuario ${element.id}`}
                               className="p-1.5 text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                             >
-                              <UserCog className="w-5 h-5" />
+                              <Edit className="w-5 h-5" />
                             </button>
                           </div>
                         </td>

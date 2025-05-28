@@ -1,0 +1,35 @@
+---
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+  {name: "Inicio", href: "/"},
+  {name: "Usuarios", href: "/users"},
+  {name: "Ventas", href: "/sales"},
+  {name: "Productos", href: "/products"},
+  {name: "Clientes", href: "/clients"},
+];
+---
+
+<nav class="bg-white shadow-lg w-64 h-screen fixed left-0 top-0 p-4">
+  <div class="mb-10">
+    <h1 class="text-xl text-center font-bold">Menu</h1>
+  </div>
+  <ul class="space-y-2">
+    {
+      navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class={`block px-4 py-3 rounded-lg transition-colors ${
+              currentPath === item.href
+                ? "bg-gray-200  font-medium"
+                : "text-gray-600 hover:bg-gray-100 hover:text-black"
+            }`}
+          >
+            {item.name}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
