@@ -1,8 +1,9 @@
 import type {ProductUpdate} from "../../models/productmodel";
+import {API_HOST} from "../variable";
 
 export default async function UpdateProduct(data: ProductUpdate) {
   try {
-    const response = await fetch("http://localhost:8000/product/update/", {
+    const response = await fetch(`${API_HOST}/product/update/`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

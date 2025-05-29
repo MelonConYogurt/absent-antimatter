@@ -1,9 +1,10 @@
 import type {FormUser} from "../../models/userModel";
+import {API_HOST} from "../variable";
 
 export default async function AddUser(data: FormUser) {
   try {
     console.log(JSON.stringify(data));
-    const url = "http://localhost:8000/users";
+    const url = `${API_HOST}/users`;
     const response = await fetch(url, {
       method: "POST",
       headers: {

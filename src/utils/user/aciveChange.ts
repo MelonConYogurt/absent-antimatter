@@ -1,10 +1,11 @@
 import type {User, responseUser} from "@/models/userModel";
+import {API_HOST} from "../variable";
 
 export default async function ActiveChange(
   data: User
 ): Promise<responseUser | false> {
   try {
-    const url = "http://localhost:8000/users/toggle-active-state/";
+    const url = `${API_HOST}/users/toggle-active-state/`;
     const response = await fetch(url, {
       method: "PATCH",
       headers: {

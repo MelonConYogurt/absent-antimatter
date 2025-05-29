@@ -1,4 +1,5 @@
 import type {responseClient} from "../../models/clientModel";
+import {API_HOST} from "../variable";
 
 export default async function SearchClients(
   offset: number,
@@ -23,7 +24,7 @@ export default async function SearchClients(
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 
-    const url = `http://localhost:8000/clients/list-filtered/?${params.toString()}`;
+    const url = `${API_HOST}/clients/list-filtered/?${params.toString()}`;
 
     const response = await fetch(url, {
       method: "GET",

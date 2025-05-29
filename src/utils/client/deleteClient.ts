@@ -1,4 +1,5 @@
 import type {responseClient} from "../../models/clientModel";
+import {API_HOST} from "../variable";
 
 export default async function DeleteClient(
   id: number
@@ -6,7 +7,7 @@ export default async function DeleteClient(
   try {
     console.log("Eliminando cliente con ID:", id);
 
-    const url = `http://localhost:8000/clients/toggle-active-state/?id=${id}`;
+    const url = `${API_HOST}/clients/toggle-active-state/?id=${id}`;
 
     const response = await fetch(url, {
       method: "PATCH",

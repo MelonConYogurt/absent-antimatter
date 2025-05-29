@@ -16,6 +16,16 @@ export default function TableProductsController() {
   const [page, setPage] = useState(0);
   const [orderDirection, setOrderDirection] = useState<string | undefined>();
   const [column, setColumn] = useState<string | undefined>();
+  const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
+  const [productToUpdate, setProductToUpdate] = useState<ProductUpdate>({
+    id: 0,
+    name: "",
+    stock: 0,
+    reference: "",
+    category_id: 0,
+    price: 0,
+    supplier_id: 0,
+  });
 
   useEffect(() => {
     GetProducts();
@@ -68,22 +78,14 @@ export default function TableProductsController() {
     console.log(`Deleting product with id: ${product.id}`);
   }
 
-  async function HandleUpdate(product: Product) {
-    const data: ProductUpdate = {
-      id: product.id,
-      name: product.name,
-      stock: product.stock,
-      reference: product.reference,
-      category_id: product.category_id,
-      price: product.price,
-      supplier_id: product.supplier_id,
-    };
-
+  async function HandleUpdate() {
     setLoading(true);
     try {
-      const response = await UpdateProduct(data);
+      const response = await UpdateProduct(productToUpdate);
       if (response) {
-        toast.success(`Producto ${product.name} actualizado correctamente`);
+        toast.success(
+          `Producto ${productToUpdate.name} actualizado correctamente`
+        );
         GetProducts();
       } else {
         toast.error("Error al actualizar el producto");
@@ -116,6 +118,28 @@ export default function TableProductsController() {
 
   function handleSearchReset() {
     setSearchValue("");
+  }
+
+  function handleOpenUpdateModal() {
+    setIsModalUpdateOpen((prev) => !prev);
+  }
+
+  function handleStateProdutToUpdate(product: Product) {
+    handleOpenUpdateModal();
+
+    setProductToUpdate(() => ({
+      id: product.id,
+      name: product.name,
+      stock: product.stock,
+      reference: product.reference,
+      category_id: product.category_id,
+      price: product.price,
+      supplier_id: product.supplier_id,
+    }));
+  }
+
+  function handleForm(e: React.ChangeEvent<HTMLInputElement>) {
+    setProductToUpdate((prev) => ({...prev, [e.target.id]: e.target.value}));
   }
 
   return (
@@ -195,10 +219,151 @@ export default function TableProductsController() {
         loading={loading}
         onActive={handleActive}
         onDelete={HandleDelete}
-        onUpdate={HandleUpdate}
+        onUpdate={handleStateProdutToUpdate}
         OnColumOrder={handleColumOrder}
       />
       <Toaster />
+
+      {isModalUpdateOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Actualizar producto
+                </h2>
+                <p className="text-gray-500 mt-1">
+                  Edita los campos necesarios para validar la actualización
+                </p>
+              </div>
+              <button
+                className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 rounded-full p-1"
+                onClick={handleOpenUpdateModal}
+                aria-label="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form className="p-6 space-y-4" onSubmit={HandleUpdate}>
+              <div className="space-y-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Nombre
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={productToUpdate.name}
+                  type="text"
+                  required
+                  id="name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese nombre de usuario"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="phone_number"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  stock
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={productToUpdate.stock}
+                  type="text"
+                  required
+                  id="phone_number"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese número de teléfono"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Reference
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={productToUpdate.reference}
+                  required
+                  id="email"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese dirección de correo"
+                />
+              </div>
+              <div className="space-y-2">
+                <label
+                  htmlFor="category_id"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Categoría
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={productToUpdate.category_id}
+                  type="number"
+                  required
+                  id="category_id"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese ID de categoría"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="price"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Precio
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={productToUpdate.price}
+                  type="number"
+                  required
+                  id="price"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese precio"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="supplier_id"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Proveedor
+                </label>
+                <input
+                  onChange={handleForm}
+                  value={productToUpdate.supplier_id}
+                  type="number"
+                  required
+                  id="supplier_id"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  placeholder="Ingrese ID de proveedor"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-2.5 px-4 mt-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                "Actualizar usuario"
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

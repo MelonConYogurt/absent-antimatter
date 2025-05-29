@@ -1,4 +1,5 @@
 import type {FormUser} from "../../models/userModel";
+import {API_HOST} from "../variable";
 
 export default async function DeleteUser(data: FormUser) {
   try {
@@ -7,7 +8,7 @@ export default async function DeleteUser(data: FormUser) {
       return false;
     }
 
-    const url = `http://localhost:8000/users/delete-by-id/?user_id=${data.id}`;
+    const url = `${API_HOST}/users/delete-by-id/?user_id=${data.id}`;
     const response = await fetch(url, {
       method: "DELETE",
       headers: {

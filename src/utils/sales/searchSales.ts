@@ -1,4 +1,5 @@
 import type {responseSales} from "../../models/saleModel";
+import {API_HOST} from "../variable";
 
 export default async function SearchSales(
   offset: number,
@@ -22,7 +23,7 @@ export default async function SearchSales(
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 
-    const url = `http://localhost:8000/sales/?${params.toString()}`;
+    const url = `${API_HOST}/sales/?${params.toString()}`;
     console.log("Consultando API en:", url);
 
     const response = await fetch(url, {

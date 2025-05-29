@@ -6,7 +6,7 @@ export interface Product {
   category_id: number;
   price: number;
   created_at: string;
-  supplier_id: string;
+  supplier_id: number;
   active: boolean;
 }
 
@@ -30,5 +30,5 @@ export interface ProductUpdate {
   reference: string;
   category_id: number;
   price: number;
-  supplier_id: string;
+  supplier_id: number;
 }

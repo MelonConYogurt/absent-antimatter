@@ -1,4 +1,5 @@
 import type {responseUser} from "@/models/userModel";
+import {API_HOST} from "../variable";
 
 export default async function SearchUsers(
   offset: number,
@@ -24,7 +25,7 @@ export default async function SearchUsers(
     params.append("offset", offset.toString());
     params.append("limit", limit.toString());
 
-    const url = `http://localhost:8000/users/list-filtered/?${params.toString()}`;
+    const url = `${API_HOST}/users/list-filtered/?${params.toString()}`;
 
     const response = await fetch(url, {
       method: "GET",
