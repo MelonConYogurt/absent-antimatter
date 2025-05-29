@@ -5,6 +5,8 @@ import type {Product, ProductUpdate} from "@/models/productmodel";
 import SearchProducts from "@/utils/products/searchProducts";
 import {ChevronLeft, ChevronRight, Loader2, Search, X} from "lucide-react";
 import UpdateProduct from "@/utils/products/updateProduct";
+import DeleteProduct from "@/utils/products/deleteProduct";
+import toggleActiveStateProduct from "@/utils/products/toggleActiveStateProduct";
 
 export default function TableProductsController() {
   const [loading, setLoading] = useState(false);
@@ -70,12 +72,28 @@ export default function TableProductsController() {
     }
   }
 
-  function handleActive(product: Product) {
+  async function handleActive(product: Product) {
     console.log(`Activating product with id: ${product.id}`);
+    const response = await toggleActiveStateProduct(product.id);
+    if (response) {
+      toast.success(
+        `Change made succesfull: Product has been ${!product.active}`
+      );
+      GetProducts();
+    } else {
+      toast.error("Error al eliminar el producto");
+    }
   }
 
-  function HandleDelete(product: Product) {
+  async function HandleDelete(product: Product) {
     console.log(`Deleting product with id: ${product.id}`);
+    const response = await DeleteProduct(product.id);
+    if (response) {
+      toast.success(`Delete was succesfull: Product deleted: ${product.name}`);
+      GetProducts();
+    } else {
+      toast.error("Error al eliminar el producto");
+    }
   }
 
   async function HandleUpdate() {
