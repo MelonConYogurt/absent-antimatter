@@ -1,9 +1,10 @@
 import TableProducts from "./tableProducts";
 import {useState, useEffect} from "react";
 import {Toaster, toast} from "sonner";
-import type {Product} from "@/models/productmodel";
+import type {Product, ProductUpdate} from "@/models/productmodel";
 import SearchProducts from "@/utils/products/searchProducts";
 import {ChevronLeft, ChevronRight, Loader2, Search, X} from "lucide-react";
+import UpdateProduct from "@/utils/products/updateProduct";
 
 export default function TableProductsController() {
   const [loading, setLoading] = useState(false);
@@ -67,8 +68,32 @@ export default function TableProductsController() {
     console.log(`Deleting product with id: ${product.id}`);
   }
 
-  function HandleUpdate(product: Product) {
-    console.log(`Updating product with id: ${product.id}`);
+  async function HandleUpdate(product: Product) {
+    const data: ProductUpdate = {
+      id: product.id,
+      name: product.name,
+      stock: product.stock,
+      reference: product.reference,
+      category_id: product.category_id,
+      price: product.price,
+      supplier_id: product.supplier_id,
+    };
+
+    setLoading(true);
+    try {
+      const response = await UpdateProduct(data);
+      if (response) {
+        toast.success(`Producto ${product.name} actualizado correctamente`);
+        GetProducts();
+      } else {
+        toast.error("Error al actualizar el producto");
+      }
+    } catch (error) {
+      console.error("Error al actualizar:", error);
+      toast.error(`Error al actualizar: ${String(error)}`);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleChangeSearInput(e: React.ChangeEvent<HTMLInputElement>) {

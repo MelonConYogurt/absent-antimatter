@@ -22,3 +22,13 @@ export interface responseProducts {
   error?: string;
   metadata?: Metadata;
 }
+
+export interface ProductUpdate {
+  id: number;
+  name: string;
+  stock: number;
+  reference: string;
+  category_id: number;
+  price: number;
+  supplier_id: string;
+}

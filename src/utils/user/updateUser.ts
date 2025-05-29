@@ -2,7 +2,7 @@ import type {FormUser} from "../../models/userModel";
 
 export default async function UpdateUser(data: FormUser) {
   try {
-    const url = "http://localhost:8000/users/update/";
+    const url = "http://localhost:8000/users/update-info/";
     const response = await fetch(url, {
       method: "PUT",
       headers: {

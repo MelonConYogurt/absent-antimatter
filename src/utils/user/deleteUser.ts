@@ -7,7 +7,7 @@ export default async function DeleteUser(data: FormUser) {
       return false;
     }
 
-    const url = `http://localhost:8000/users/delete/?user_id=${data.id}`;
+    const url = `http://localhost:8000/users/delete-by-id/?user_id=${data.id}`;
     const response = await fetch(url, {
       method: "DELETE",
       headers: {

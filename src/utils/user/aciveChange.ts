@@ -4,7 +4,7 @@ export default async function ActiveChange(
   data: User
 ): Promise<responseUser | false> {
   try {
-    const url = "http://localhost:8000/users/change/state/";
+    const url = "http://localhost:8000/users/toggle-active-state/";
     const response = await fetch(url, {
       method: "PATCH",
       headers: {
