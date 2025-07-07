@@ -2,8 +2,16 @@
 import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
 import TableClientsController from "@/components/TableClientsController";
+import NavBar from "../components/NavBar.astro";
 ---
 
 <Layout>
-  <TableClientsController client:load />
+  <div class="flex w-full h-screen">
+    <div class="min-w-[60px] max-w-[200px] h-full">
+      <NavBar client:load />
+    </div>
+    <div class="flex-1 overflow-auto">
+      <TableClientsController client:load />
+    </div>
+  </div>
 </Layout>

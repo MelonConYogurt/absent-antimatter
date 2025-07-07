@@ -1,7 +1,3 @@
----
-import NavBar from "../components/NavBar.astro";
----
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -9,11 +5,8 @@ import NavBar from "../components/NavBar.astro";
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
-  <body class="bg-gray-50">
-    <NavBar />
-    <div class="ml-64 p-8 min-h-screen">
-      <slot />
-    </div>
+  <body>
+    <slot />
   </body>
 </html>
 
@@ -21,7 +14,8 @@ import NavBar from "../components/NavBar.astro";
   html,
   body {
     margin: 0;
+    padding: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
   }
 </style>

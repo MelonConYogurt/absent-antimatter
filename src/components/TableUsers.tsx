@@ -38,10 +38,7 @@ export default function TableUsers({
     <section className="w-full mb-10">
       <div className="w-full overflow-hidden border border-gray-200 rounded-lg shadow-md bg-white">
         {loading ? (
-          <div
-            role="status"
-            className="flex items-center justify-center w-full py-16"
-          >
+          <div role="status" className="flex items-center justify-center py-16">
             <Loader2 className="w-10 h-10 text-gray-400 animate-spin" />
             <span className="sr-only">Cargando...</span>
           </div>
@@ -279,7 +276,7 @@ export default function TableUsers({
                 </table>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+              <div className="flex flex-col items-center justify-center py-16 px-4 text-center w-full">
                 <div className="mb-4 p-4 bg-gray-100 rounded-full">
                   <UserX className="w-8 h-8 text-gray-400" />
                 </div>

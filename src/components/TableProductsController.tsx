@@ -1,5 +1,5 @@
 import TableProducts from "./tableProducts";
-import {useState, useEffect} from "react";
+import {useState, useEffect, use} from "react";
 import {Toaster, toast} from "sonner";
 import type {Product, ProductUpdate} from "@/models/productmodel";
 import SearchProducts from "@/utils/products/searchProducts";
@@ -19,6 +19,10 @@ export default function TableProductsController() {
   const [orderDirection, setOrderDirection] = useState<string | undefined>();
   const [column, setColumn] = useState<string | undefined>();
   const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+  const [isModalActiveOpen, setIsModalActiveOpen] = useState(false);
+  const [productToActive, setProductToActive] = useState<Product | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [productToUpdate, setProductToUpdate] = useState<ProductUpdate>({
     id: 0,
     name: "",
@@ -74,26 +78,70 @@ export default function TableProductsController() {
 
   async function handleActive(product: Product) {
     console.log(`Activating product with id: ${product.id}`);
-    const response = await toggleActiveStateProduct(product.id);
-    if (response) {
-      toast.success(
-        `Change made succesfull: Product has been ${!product.active}`
-      );
-      GetProducts();
-    } else {
-      toast.error("Error al eliminar el producto");
+    setIsModalActiveOpen(true);
+    setProductToActive(product);
+  }
+
+  async function confirmActive() {
+    if (!productToActive) return;
+
+    setLoading(true);
+    try {
+      const response = await toggleActiveStateProduct(productToActive.id);
+      if (response) {
+        toast.success(
+          `Change made succesfull: Product has been ${!productToActive.active}`
+        );
+        GetProducts();
+      } else {
+        toast.error("Error al eliminar el producto");
+      }
+    } catch (error) {
+      toast.error(String(error));
+    } finally {
+      setLoading(false);
+      cancelActive();
     }
   }
 
   async function HandleDelete(product: Product) {
     console.log(`Deleting product with id: ${product.id}`);
-    const response = await DeleteProduct(product.id);
-    if (response) {
-      toast.success(`Delete was succesfull: Product deleted: ${product.name}`);
-      GetProducts();
-    } else {
-      toast.error("Error al eliminar el producto");
+
+    setProductToDelete(product);
+    setIsModalDeleteOpen(true);
+  }
+
+  async function confirmDelete() {
+    if (!productToDelete) return;
+
+    setLoading(true);
+    try {
+      const response = await DeleteProduct(productToDelete.id);
+      if (response) {
+        toast.success(
+          `Delete was succesfull: Product deleted: ${productToDelete.name}`
+        );
+        GetProducts();
+      } else {
+        toast.error("Error al eliminar el producto");
+      }
+    } catch (error) {
+      console.error("Error al eliminar:", error);
+      toast.error(`Error al eliminar: ${String(error)}`);
+    } finally {
+      setLoading(false);
+      cancelDelete();
     }
+  }
+
+  function cancelDelete() {
+    setIsModalDeleteOpen(false);
+    setProductToDelete(null);
+  }
+
+  function cancelActive() {
+    setIsModalActiveOpen(false);
+    setProductToActive(null);
   }
 
   async function HandleUpdate() {
@@ -161,7 +209,7 @@ export default function TableProductsController() {
   }
 
   return (
-    <section className="w-full flex flex-col gap-6 px-5 py-6 bg-gray-50">
+    <section className="p-5 flex flex-col gap-5">
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">
           Gestión de Productos
@@ -204,7 +252,8 @@ export default function TableProductsController() {
 
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="text-gray-600 text-sm whitespace-nowrap">
-            Mostrando usuarios {limit} de {totalProducts}
+            Mostrando {page > 0 ? limit * (page + 1) : limit} de {totalProducts}{" "}
+            productos
           </div>
 
           <div className="flex items-center gap-2">
@@ -241,6 +290,73 @@ export default function TableProductsController() {
         OnColumOrder={handleColumOrder}
       />
       <Toaster />
+
+      {isModalActiveOpen && productToActive && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Cambio de estado del producto
+                </h2>
+                <p className="text-gray-500 mt-1">
+                  Confirma el cambio de estado del producto
+                </p>
+              </div>
+              <button
+                className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 rounded-full p-1"
+                onClick={cancelActive}
+                aria-label="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div>
+              <div className="p-6">
+                <div className="mb-4">
+                  <p className="text-gray-700">
+                    ¿Estás seguro de que quieres{" "}
+                    {productToActive.active ? "desactivar" : "activar"} el
+                    producto{" "}
+                    <span className="font-semibold text-gray-900">
+                      {productToActive.name}
+                    </span>
+                    ?
+                  </p>
+                </div>
+
+                <div className="flex gap-3 justify-end">
+                  <button
+                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    onClick={cancelActive}
+                    disabled={loading}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
+                    onClick={confirmActive}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        {productToActive.active
+                          ? "Desactivando..."
+                          : "Activando..."}
+                      </>
+                    ) : productToActive.active ? (
+                      "Desactivar"
+                    ) : (
+                      "Activar"
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isModalUpdateOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -376,9 +492,69 @@ export default function TableProductsController() {
                 type="submit"
                 className="w-full py-2.5 px-4 mt-4 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                "Actualizar usuario"
+                Actualizar usuario
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isModalDeleteOpen && productToDelete && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Confirmar eliminación
+                </h2>
+                <p className="text-gray-500 mt-1">
+                  Esta acción no se puede deshacer
+                </p>
+              </div>
+              <button
+                className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 rounded-full p-1"
+                onClick={cancelDelete}
+                aria-label="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="mb-4">
+                <p className="text-gray-700">
+                  ¿Estás seguro de que quieres eliminar el producto{" "}
+                  <span className="font-semibold text-gray-900">
+                    {productToDelete.name}
+                  </span>
+                  ?
+                </p>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  onClick={cancelDelete}
+                  disabled={loading}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
+                  onClick={confirmDelete}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Eliminando...
+                    </>
+                  ) : (
+                    "Eliminar"
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

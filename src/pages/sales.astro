@@ -2,8 +2,16 @@
 import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
 import TableSalesControllers from "../components/TableSalesController";
+import NavBar from "../components/NavBar.astro";
 ---
 
 <Layout>
-  <TableSalesControllers client:load />
+  <div class="flex w-full h-full">
+    <div class="min-w-[60px] max-w-[200px]">
+      <NavBar client:load />
+    </div>
+    <div class="flex-1">
+      <TableSalesControllers client:load />
+    </div>
+  </div>
 </Layout>

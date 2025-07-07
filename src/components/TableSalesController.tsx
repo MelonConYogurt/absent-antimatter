@@ -90,7 +90,7 @@ export default function TableSalesController() {
   function handleColumOrder(col: string, colDirection: string) {
     setColumn(col);
     setOrderDirection(colDirection);
-    console.log(`Col: ${col}, direction: ${colDirection}`);
+    -console.log(`Col: ${col}, direction: ${colDirection}`);
   }
 
   function handleSearchReset() {
@@ -98,7 +98,7 @@ export default function TableSalesController() {
   }
 
   return (
-    <section className="w-full flex flex-col gap-6 px-5 py-6 bg-gray-50">
+    <section className="w-full p-5 flex flex-col gap-5">
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de ventas</h1>
         <p className="text-gray-600 mt-1">Administre las ventas.</p>
@@ -139,7 +139,8 @@ export default function TableSalesController() {
 
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="text-gray-600 text-sm whitespace-nowrap">
-            Mostrando ventas {limit} de {totalSales}
+            Mostrando {Math.min(offset + limit, totalSales)} de {totalSales}{" "}
+            ventas
           </div>
 
           <div className="flex items-center gap-2">

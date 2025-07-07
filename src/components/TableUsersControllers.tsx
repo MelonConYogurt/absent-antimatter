@@ -295,7 +295,7 @@ export default function TableUsersController() {
   }
 
   return (
-    <section className="w-full flex flex-col gap-6 px-5 py-6 bg-gray-50">
+    <section className="p-5 flex flex-col gap-5">
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">
           Gestión de Usuarios
@@ -340,7 +340,7 @@ export default function TableUsersController() {
 
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="text-gray-600 text-sm whitespace-nowrap">
-            Mostrando {Math.min(limit, usersData.length)} de {totalItems}{" "}
+            Mostrando {Math.min(offset + limit, totalItems)} de {totalItems}{" "}
             usuarios
           </div>
 
