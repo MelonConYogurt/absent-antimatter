@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
 import NavBar from "../components/NavBar.astro";
+import Dashboard from "@/components/dashboard";
 ---
 
 <Layout>
@@ -9,6 +10,8 @@ import NavBar from "../components/NavBar.astro";
     <div class="min-w-[60px] max-w-[200px]">
       <NavBar client:load />
     </div>
-    <div class="flex-1"></div>
+    <div class="flex-1">
+      <Dashboard client:load />
+    </div>
   </div>
 </Layout>

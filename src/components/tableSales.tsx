@@ -1,5 +1,5 @@
 import type {Sale} from "../models/saleModel";
-import {UserX, UserCog, Loader2, ArrowDownUp, Edit, Trash} from "lucide-react";
+import {UserX,  Loader2, ArrowDownUp, Edit, Trash} from "lucide-react";
 import {useState} from "react";
 
 export default function TableSales({
