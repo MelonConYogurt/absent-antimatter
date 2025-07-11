@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [salesYesterday, setSalesYesterday] = useState(null);
   const [lastMonthSales, setLastMonthSales] = useState(null);
   const [inventoryValue, setInventoryValue] = useState(null);
+  const [lastSevenDaysSales, setLastSevenDaysSales] = useState({});
 
   useEffect(() => {
     async function getProducts() {
@@ -58,6 +59,41 @@ export default function Dashboard() {
       } else {
         toast.error("Error el obtener la ventas de ayer");
       }
+    }
+
+    async function getSalesLastSevenDays() {
+      const today = new Date();
+
+      let data = [];
+
+      for (let i = 1; i <= 7; i++) {
+        const lastDay = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate() - i
+        );
+
+        const yearLastDay = lastDay.getFullYear();
+        const monthLastDay = String(lastDay.getMonth() + 1);
+        const dayLastDay = String(lastDay.getDate());
+
+        const LastDayDate = `${yearLastDay}-${monthLastDay}-${dayLastDay}`;
+
+        data.push(LastDayDate);
+      }
+
+      data.forEach(async (day, index) => {
+        const response = await getSalesByDay(day);
+
+        if (response.success) {
+          setLastSevenDaysSales((prev) => ({
+            ...prev,
+            [index]: {dayNumber: index, daySales: response.data, date: day},
+          }));
+        } else {
+          toast.error("Error el obtener la ventas");
+        }
+      });
     }
 
     async function getLastMonthSales() {
@@ -108,6 +144,7 @@ export default function Dashboard() {
     getYesterdaysSales();
     getLastMonthSales();
     getInventoryValue();
+    getSalesLastSevenDays();
   }, []);
 
   return (
@@ -214,7 +251,15 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-
+      <div>
+        <button
+          onClick={() => {
+            console.log(lastSevenDaysSales);
+          }}
+        >
+          VER DATOS
+        </button>
+      </div>
       <Toaster />
     </div>
   );
