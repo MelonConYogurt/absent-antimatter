@@ -4,7 +4,7 @@ import {API_HOST} from "../variable";
 export default async function AddUser(data: FormUser) {
   try {
     console.log(JSON.stringify(data));
-    const url = `${API_HOST}/users`;
+    const url = `${API_HOST}/users/create/`;
     const response = await fetch(url, {
       method: "POST",
       headers: {

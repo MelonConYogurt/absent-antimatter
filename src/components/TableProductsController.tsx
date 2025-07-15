@@ -14,6 +14,7 @@ export default function TableProductsController() {
   const [offset, setOffset] = useState(0);
   const [limit, setLimit] = useState(20);
   const [searchValue, setSearchValue] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [totalProducts, setTotalProducts] = useState(0);
   const [page, setPage] = useState(0);
   const [orderDirection, setOrderDirection] = useState<string | undefined>();
@@ -34,8 +35,23 @@ export default function TableProductsController() {
   });
 
   useEffect(() => {
+    function getParams() {
+      const params = new URLSearchParams(window.location.search);
+
+      params.forEach((value, key) => {
+        if (params.has("search")) {
+          const searchParam = params.get("search") || "";
+          setSearchValue(searchParam);
+          setSearchInput(searchParam);
+        }
+      });
+    }
+    getParams();
+  }, []);
+
+  useEffect(() => {
     GetProducts();
-  }, [offset, column, orderDirection]);
+  }, [offset, column, orderDirection, searchValue]);
 
   useEffect(() => {
     if (searchValue === "") {
@@ -165,7 +181,36 @@ export default function TableProductsController() {
   }
 
   function handleChangeSearInput(e: React.ChangeEvent<HTMLInputElement>) {
-    setSearchValue(e.target.value);
+    const value = e.target.value;
+    setSearchInput(value);
+  }
+
+  function confirmSearch() {
+    const params = new URLSearchParams(window.location.search);
+
+    if (searchInput) {
+      params.set("search", searchInput);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, "", newUrl);
+    }
+
+    setSearchValue(searchInput);
+    setOffset(0);
+  }
+
+  function handleSearchReset() {
+    const params = new URLSearchParams(window.location.search);
+    params.delete("search");
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, "", newUrl);
+
+    setOffset(0);
+    setSearchValue("");
+    setSearchInput("");
+  }
+
+  async function handleSearchProducts() {
+    confirmSearch();
   }
 
   function handlePageUp() {
@@ -180,10 +225,6 @@ export default function TableProductsController() {
     setColumn(col);
     setOrderDirection(colDirection);
     console.log(`Col: ${col}, direction: ${colDirection}`);
-  }
-
-  function handleSearchReset() {
-    setSearchValue("");
   }
 
   function handleOpenUpdateModal() {
@@ -227,7 +268,7 @@ export default function TableProductsController() {
               className="w-full px-2 outline-none border-none text-sm text-gray-700 placeholder-gray-400"
               onChange={handleChangeSearInput}
               disabled={loading}
-              value={searchValue}
+              value={searchInput}
             />
             <X
               className=" text-red-400 w-5 h-5 cursor-pointer"
@@ -236,7 +277,7 @@ export default function TableProductsController() {
           </div>
           <button
             className="ml-2 px-4 py-2.5 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
-            onClick={GetProducts}
+            onClick={handleSearchProducts}
             disabled={loading}
           >
             {loading ? (

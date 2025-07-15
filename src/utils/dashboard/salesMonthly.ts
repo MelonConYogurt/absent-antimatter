@@ -8,13 +8,14 @@ export async function getSalesThisMonth(month: string | null = null) {
       params.append("date", month);
     }
 
-    const response = await fetch(
-      `${API_HOST}/sales/monthly/${params.toString()}`,
-      {
-        method: "GET",
-        headers: {"Content-Type": "application/json"},
-      }
-    );
+    const url = params.toString()
+      ? `${API_HOST}/sales/monthly/?${params.toString()}`
+      : `${API_HOST}/sales/monthly/`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {"Content-Type": "application/json"},
+    });
 
     if (response.ok) {
       return response.json();

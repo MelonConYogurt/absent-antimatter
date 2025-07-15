@@ -35,6 +35,7 @@ export default function TableUsersController() {
     phone_number: "",
   });
   const [searchValue, setSearchValue] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [orderDirection, setOrderDirection] = useState<string | undefined>();
   const [column, setColumn] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
@@ -47,14 +48,23 @@ export default function TableUsersController() {
   const totalPages = Math.ceil(totalItems / limit);
 
   useEffect(() => {
-    fetchUsers();
-  }, [page, column, orderDirection]);
+    function getParams() {
+      const params = new URLSearchParams(window.location.search);
+
+      params.forEach((value, key) => {
+        if (params.has("search")) {
+          const searchParam = params.get("search") || "";
+          setSearchValue(searchParam);
+          setSearchInput(searchParam);
+        }
+      });
+    }
+    getParams();
+  }, []);
 
   useEffect(() => {
-    if (searchValue === "") {
-      fetchUsers();
-    }
-  }, [searchValue]);
+    fetchUsers();
+  }, [page, column, orderDirection, searchValue]);
 
   async function fetchUsers() {
     setIsLoading(true);
@@ -76,14 +86,16 @@ export default function TableUsersController() {
         }
       } else {
         toast.error(
-          `Error al cargar usuarios, por favor intente recargar la página. ${
-            data.error ? data.error : ""
+          `Error al cargar la lista de usuarios. ${
+            data.error
+              ? `Detalle: ${data.error}`
+              : "Por favor, intente recargar la página."
           }`
         );
       }
     } catch (error) {
       toast.error(
-        `Error, por favor reporte al soporte. Tipo de error: ${error}`
+        `Error inesperado al cargar usuarios. Por favor, contacte al soporte técnico.`
       );
     } finally {
       setIsLoading(false);
@@ -123,7 +135,7 @@ export default function TableUsersController() {
 
       const validation = await AddUser(userData);
       if (validation) {
-        toast.success("Usuario creado exitosamente");
+        toast.success("¡Usuario creado exitosamente!");
         fetchUsers();
         setFormUser({
           email: "",
@@ -133,7 +145,7 @@ export default function TableUsersController() {
         handleModal();
       } else {
         toast.error(
-          "Error al agregar usuario. Por favor verifique los datos, especialmente el correo, e intente nuevamente."
+          "No se pudo crear el usuario. Verifique que el correo electrónico no esté registrado e intente nuevamente."
         );
         setFormUser({
           email: "",
@@ -142,7 +154,7 @@ export default function TableUsersController() {
         });
       }
     } catch (error) {
-      toast.error(`Error: ${error}`);
+      toast.error(`Error al crear usuario: ${error}`);
     } finally {
       setIsSubmitting(false);
       setIsValidationFinish(true);
@@ -150,28 +162,42 @@ export default function TableUsersController() {
   }
 
   function handleSearchInput(e: React.ChangeEvent<HTMLInputElement>) {
-    setSearchValue(e.target.value);
+    const value = e.target.value;
+    setSearchInput(value);
+  }
+
+  function confirmSearch() {
+    const params = new URLSearchParams(window.location.search);
+
+    if (searchInput) {
+      params.set("search", searchInput);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, "", newUrl);
+    }
+
+    setSearchValue(searchInput);
+    setPage(0);
   }
 
   function handleSearchReset() {
+    const params = new URLSearchParams(window.location.search);
+    params.delete("search");
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, "", newUrl);
+
+    setPage(0);
     setSearchValue("");
+    setSearchInput("");
   }
 
   function handleColumnOrder(col: string, colDirection: string) {
     setColumn(col);
     setOrderDirection(colDirection);
+    setPage(0);
   }
 
   async function handleSearchUser() {
-    setIsLoading(true);
-
-    try {
-      await fetchUsers();
-    } catch (error) {
-      toast.error(`Error en la búsqueda: ${error}`);
-    } finally {
-      setIsLoading(false);
-    }
+    confirmSearch();
   }
 
   function handleFormUser(e: React.FormEvent<HTMLFormElement>) {
@@ -197,13 +223,13 @@ export default function TableUsersController() {
       });
 
       if (result) {
-        toast.success("Usuario eliminado correctamente");
+        toast.success("¡Usuario eliminado exitosamente!");
         await fetchUsers();
       } else {
-        toast.error("Error al eliminar el usuario");
+        toast.error("No se pudo eliminar el usuario. Intente nuevamente.");
       }
     } catch (error) {
-      toast.error(`Error: ${error}`);
+      toast.error(`Error al eliminar usuario: ${error}`);
     } finally {
       setIsDeleteModalOpen(false);
       setUserToDelete(null);
@@ -222,7 +248,7 @@ export default function TableUsersController() {
 
       setIsUpdateModalOpen(true);
     } catch (error) {
-      toast.error(`Error: ${error}`);
+      toast.error(`Error al cargar datos del usuario: ${error}`);
     }
   }
 
@@ -234,14 +260,14 @@ export default function TableUsersController() {
     try {
       const result = await UpdateUser(formUser);
       if (result) {
-        toast.success("Usuario actualizado correctamente");
+        toast.success("¡Usuario actualizado exitosamente!");
         await fetchUsers();
         handleUpdateModal();
       } else {
-        toast.error("Error al actualizar el usuario");
+        toast.error("No se pudo actualizar el usuario. Intente nuevamente.");
       }
     } catch (error) {
-      toast.error(`Error: ${error}`);
+      toast.error(`Error al actualizar usuario: ${error}`);
     } finally {
       setIsSubmitting(false);
       setIsValidationFinish(true);
@@ -262,19 +288,21 @@ export default function TableUsersController() {
       if (result) {
         if (result.success) {
           toast.success(
-            `Se ha ${
+            `Usuario ${userToChangeActive.name} ${
               userToChangeActive.active ? "desactivado" : "activado"
-            } el usuario ${userToChangeActive.name}`
+            } exitosamente.`
           );
           await fetchUsers();
         } else {
-          toast.error("Error al cambiar el estado del usuario");
+          toast.error(
+            "No se pudo cambiar el estado del usuario. Intente nuevamente."
+          );
         }
       } else {
-        toast.error("Error al cambiar el estado del usuario");
+        toast.error("Error de conexión al cambiar el estado del usuario.");
       }
     } catch (error) {
-      toast.error(`Error: ${error}`);
+      toast.error(`Error al cambiar estado del usuario: ${error}`);
     } finally {
       setIsActiveModalOpen(false);
       setUserToChangeActive(null);
@@ -315,7 +343,7 @@ export default function TableUsersController() {
               className="w-full px-2 outline-none border-none text-sm text-gray-700 placeholder-gray-400"
               onChange={handleSearchInput}
               disabled={isLoading}
-              value={searchValue}
+              value={searchInput}
             />
             <X
               className="text-red-400 w-5 h-5 cursor-pointer"

@@ -318,9 +318,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Contenedor principal para los gráficos */}
       <div className="flex flex-col gap-6">
-        {/* Gráfico de ventas de los últimos 7 días - Ocupa el ancho completo */}
         <div className="w-full">
           <div className="p-6 rounded-lg shadow-md border border-gray-200 bg-gradient-to-br from-blue-50 to-white">
             <div className="flex items-center justify-between mb-6">
@@ -368,7 +366,6 @@ export default function Dashboard() {
                     },
                   ]}
                   grid={{horizontal: true, vertical: false}}
-                  margin={{left: 80, right: 20, top: 20, bottom: 60}}
                 />
               </div>
             )}
@@ -376,9 +373,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Contenedor para los dos gráficos de barras */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {/* Gráfico de productos más vendidos */}
         <div className="w-full">
           <div className="p-6 rounded-lg shadow-md border border-gray-200 bg-gradient-to-br from-green-50 to-white">
             <div className="flex items-center justify-between mb-6">
@@ -432,14 +427,12 @@ export default function Dashboard() {
                   ]}
                   layout="horizontal"
                   grid={{horizontal: true, vertical: false}}
-                  margin={{left: 120, right: 20, top: 20, bottom: 40}}
                 />
               </div>
             )}
           </div>
         </div>
 
-        {/* Gráfico de productos con stock bajo */}
         <div className="w-full">
           <div className="p-6 rounded-lg shadow-md border border-gray-200 bg-gradient-to-br from-red-50 to-white">
             <div className="flex items-center justify-between mb-6">
@@ -482,7 +475,6 @@ export default function Dashboard() {
                         fontSize: 12,
                         fill: "#6B7280",
                       },
-                      valueFormatter: (value) => `${value} unidades`,
                     },
                   ]}
                   series={[
@@ -492,9 +484,7 @@ export default function Dashboard() {
                       color: "#EF4444",
                     },
                   ]}
-                  layout="horizontal"
                   grid={{horizontal: true, vertical: false}}
-                  margin={{left: 120, right: 20, top: 20, bottom: 40}}
                 />
               </div>
             )}
