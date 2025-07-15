@@ -228,7 +228,10 @@ export default function TableProducts({
                           {element.category_id}
                         </td>
                         <td className="px-6 py-4 text-gray-500">
-                          ${element.price.toFixed(2)}
+                          {element.price.toLocaleString("es-CO", {
+                            style: "currency",
+                            currency: "COP",
+                          })}
                         </td>
                         <td className="px-6 py-4 text-gray-500">
                           {element.created_at}

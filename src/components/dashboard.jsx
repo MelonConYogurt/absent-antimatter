@@ -46,7 +46,7 @@ export default function Dashboard() {
       const response = await getSalesToday();
 
       if (response && response.success) {
-        setSalesToday(response.data);
+        setSalesToday(response.data < 0 ? 0 : response.data);
       } else {
         toast.error("Error al obtener las ventas de hoy");
       }
@@ -107,7 +107,7 @@ export default function Dashboard() {
               dayNumber: i,
               daySales: response.data || 0,
               date: dates[i],
-              displayDate: new Date(dates[i]).toLocaleDateString("es-ES", {
+              displayDate: new Date(dates[i]).toLocaleDateString("es-CO", {
                 month: "short",
                 day: "numeric",
               }),
@@ -117,7 +117,7 @@ export default function Dashboard() {
               dayNumber: i,
               daySales: 0,
               date: dates[i],
-              displayDate: new Date(dates[i]).toLocaleDateString("es-ES", {
+              displayDate: new Date(dates[i]).toLocaleDateString("es-CO", {
                 month: "short",
                 day: "numeric",
               }),
@@ -129,7 +129,7 @@ export default function Dashboard() {
             dayNumber: i,
             daySales: 0,
             date: dates[i],
-            displayDate: new Date(dates[i]).toLocaleDateString("es-ES", {
+            displayDate: new Date(dates[i]).toLocaleDateString("es-CO", {
               month: "short",
               day: "numeric",
             }),
@@ -226,7 +226,12 @@ export default function Dashboard() {
           </div>
           <div className="text-3xl font-bold text-green-600 mb-2">
             {salesToday !== null ? (
-              `$${salesToday.toLocaleString()}`
+              salesToday.toLocaleString("es-CO", {
+                style: "currency",
+                currency: "COP",
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })
             ) : (
               <Loader2 className="w-10 h-10 text-gray-400 animate-spin" />
             )}
@@ -267,7 +272,12 @@ export default function Dashboard() {
           </div>
           <div className="text-3xl font-bold text-blue-600 mb-2">
             {salesThisMonth !== null ? (
-              `$${salesThisMonth.toLocaleString()}`
+              salesThisMonth.toLocaleString("es-CO", {
+                style: "currency",
+                currency: "COP",
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })
             ) : (
               <Loader2 className="w-10 h-10 text-gray-400 animate-spin" />
             )}
@@ -288,7 +298,12 @@ export default function Dashboard() {
           </div>
           <div className="text-3xl font-bold text-purple-600 mb-2">
             {inventoryValue !== null ? (
-              `$${inventoryValue.toLocaleString()}`
+              inventoryValue.toLocaleString("es-CO", {
+                style: "currency",
+                currency: "COP",
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })
             ) : (
               <Loader2 className="w-10 h-10 text-gray-400 animate-spin" />
             )}
@@ -352,7 +367,13 @@ export default function Dashboard() {
                         fontSize: 12,
                         fill: "#6B7280",
                       },
-                      valueFormatter: (value) => `$${value.toLocaleString()}`,
+                      valueFormatter: (value) =>
+                        value.toLocaleString("es-CO", {
+                          style: "currency",
+                          currency: "COP",
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
+                        }),
                     },
                   ]}
                   series={[
@@ -457,7 +478,7 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="w-full h-80">
-                <BarChart
+                {/* <BarChart
                   dataset={datasetLowStockProduct}
                   yAxis={[
                     {
@@ -485,7 +506,7 @@ export default function Dashboard() {
                     },
                   ]}
                   grid={{horizontal: true, vertical: false}}
-                />
+                /> */}
               </div>
             )}
           </div>

@@ -1,15 +1,11 @@
 ---
 import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
-import NavBar from "../components/NavBar.astro";
 import Dashboard from "@/components/dashboard";
 ---
 
 <Layout>
   <div class="flex w-full h-full">
-    <div class="min-w-[60px] max-w-[200px]">
-      <NavBar client:load />
-    </div>
     <div class="flex-1 overflow-auto">
       <Dashboard client:load />
     </div>

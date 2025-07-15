@@ -1,5 +1,5 @@
 import type {Sale} from "../models/saleModel";
-import {UserX,  Loader2, ArrowDownUp, Edit, Trash} from "lucide-react";
+import {UserX, Loader2, ArrowDownUp, Edit, Trash} from "lucide-react";
 import {useState} from "react";
 
 export default function TableSales({
@@ -147,16 +147,23 @@ export default function TableSales({
                           {element.id}
                         </td>
                         <td className="px-6 py-4 font-medium text-gray-900">
-                          {element.client_id}
+                          <a href={`/clients?search=${element.client_id}`}>
+                            {element.client_id}
+                          </a>
                         </td>
                         <td className="px-6 py-4 text-gray-500">
-                          {element.user_id}
+                          <a href={`/users?search=${element.user_id}`}>
+                            {element.user_id}
+                          </a>
                         </td>
                         <td className="px-6 py-4 text-gray-500">
                           {element.sale_date}
                         </td>
                         <td className="px-6 py-4 text-gray-500">
-                          {element.total}
+                          {element.total.toLocaleString("es-CO", {
+                            style: "currency",
+                            currency: "COP",
+                          })}
                         </td>
 
                         <td className="px-6 py-4">
