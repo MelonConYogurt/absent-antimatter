@@ -42,12 +42,13 @@ export default function Dashboard() {
       }
     }
 
-    async function getTodaysSales() {
+    async function getTodaySales() {
       const response = await getSalesToday();
 
       if (response && response.success) {
-        setSalesToday(response.data < 0 ? 0 : response.data);
+        setSalesToday(response.data <= 0 ? 0 : response.data);
       } else {
+        setSalesToday(0);
         toast.error("Error al obtener las ventas de hoy");
       }
     }
@@ -69,8 +70,9 @@ export default function Dashboard() {
       const response = await getSalesByDay(yesterdayDate);
 
       if (response.success) {
-        setSalesYesterday(response.data);
+        setSalesYesterday(response.data <= 0 ? 0 : response.data);
       } else {
+        setSalesYesterday(0);
         toast.error("Error el obtener la ventas de ayer");
       }
     }
@@ -184,7 +186,7 @@ export default function Dashboard() {
     }
 
     getProducts();
-    getTodaysSales();
+    getTodaySales();
     getThisMonthSales();
     getYesterdaysSales();
     getLastMonthSales();
@@ -199,9 +201,7 @@ export default function Dashboard() {
         <div className="p-6 rounded-lg shadow-md border border-gray-200 bg-gradient-to-br from-green-50 to-white hover:shadow-lg transition-shadow duration-300">
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-lg font-bold text-gray-800">Ventas de Hoy</h3>
-            {salesYesterday !== null &&
-            salesToday !== null &&
-            salesYesterday !== 0 ? (
+            {salesYesterday !== null && salesToday !== null ? (
               <span
                 className={`text-xs font-bold px-3 py-1 rounded-full ${
                   ((salesToday - salesYesterday) / salesYesterday) * 100 >= 0
@@ -478,35 +478,21 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="w-full h-80">
-                {/* <BarChart
-                  dataset={datasetLowStockProduct}
-                  yAxis={[
-                    {
-                      scaleType: "band",
-                      dataKey: "name",
-                      tickLabelStyle: {
-                        fontSize: 11,
-                        fill: "#374151",
+                {datasetLowStockProduct !== null ? (
+                  <BarChart
+                    dataset={datasetLowStockProduct}
+                    series={[
+                      {
+                        dataKey: "stock",
+                        label: "Productos con stock bajo",
+                        color: "#e7000b",
                       },
-                    },
-                  ]}
-                  xAxis={[
-                    {
-                      tickLabelStyle: {
-                        fontSize: 12,
-                        fill: "#6B7280",
-                      },
-                    },
-                  ]}
-                  series={[
-                    {
-                      dataKey: "stock",
-                      label: "Stock disponible",
-                      color: "#EF4444",
-                    },
-                  ]}
-                  grid={{horizontal: true, vertical: false}}
-                /> */}
+                    ]}
+                    xAxis={[{dataKey: "name"}]}
+                  />
+                ) : (
+                  <div></div>
+                )}
               </div>
             )}
           </div>

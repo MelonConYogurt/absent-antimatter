@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-gray-800 shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
@@ -89,7 +89,6 @@ const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
@@ -107,13 +106,12 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       <div
         className={`md:hidden transition-all duration-300 ease-in-out ${
           isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
         }`}
       >
-        <div className="px-2 pt-2 pb-3 space-y-1 bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-700">
+        <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-900">
           {navItems.map((item) => (
             <a
               key={item.name}
