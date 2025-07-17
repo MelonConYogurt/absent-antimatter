@@ -1,6 +1,29 @@
 import {Package} from "lucide-react";
+import {useState} from "react";
+import getToken from "../utils/auth/getToken";
 
 export default function LoginComponent() {
+  const [credentials, setCredentials] = useState<{
+    email: string;
+    password: string;
+  }>({
+    email: "",
+    password: "",
+  });
+
+  function handleInputForm(e: React.ChangeEvent<HTMLInputElement>) {
+    setCredentials((prev: any) => ({...prev, [e.target.id]: e.target.value}));
+  }
+
+  async function sendCredentials() {
+    if (credentials) {
+      const response = await getToken(credentials.email, credentials.password);
+      if (response) {
+        console.log(response);
+      }
+    }
+  }
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-900">
@@ -26,6 +49,7 @@ export default function LoginComponent() {
               </label>
               <div className="mt-2">
                 <input
+                  onChange={handleInputForm}
                   id="email"
                   name="email"
                   type="email"
@@ -55,6 +79,7 @@ export default function LoginComponent() {
               </div>
               <div className="mt-2">
                 <input
+                  onChange={handleInputForm}
                   id="password"
                   name="password"
                   type="password"
@@ -67,7 +92,8 @@ export default function LoginComponent() {
 
             <div>
               <button
-                type="submit"
+                type="button"
+                onClick={sendCredentials}
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Sign in
