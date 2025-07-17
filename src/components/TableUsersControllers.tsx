@@ -14,10 +14,10 @@ import "react-international-phone/style.css";
 import type {User, FormUser} from "../models/userModel";
 import AddUser from "../utils/user/addUser";
 import TableUsers from "./TableUsers";
-import DeleteUser from "@/utils/user/deleteUser";
-import UpdateUser from "@/utils/user/updateUser";
-import SearchUsers from "@/utils/user/searchUser";
-import ActiveChange from "@/utils/user/aciveChange";
+import DeleteUser from "../utils/user/deleteUser";
+import UpdateUser from "../utils/user/updateUser";
+import SearchUsers from "../utils/user/searchUser";
+import ActiveChange from "../utils/user/aciveChange";
 
 export default function TableUsersController() {
   const [isModalOpen, setIsModalOpen] = useState(false);

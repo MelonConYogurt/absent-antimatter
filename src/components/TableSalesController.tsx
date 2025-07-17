@@ -4,7 +4,7 @@ import {Toaster, toast} from "sonner";
 import type {Sale} from "../models/saleModel";
 import SearchSales from "../utils/sales/searchSales";
 import {ChevronLeft, ChevronRight, Loader2, Search, X} from "lucide-react";
-import {DeleteSale} from "@/utils/sales/deleteSale";
+import {DeleteSale} from "../utils/sales/deleteSale";
 
 export default function TableSalesController() {
   const [loading, setLoading] = useState(false);

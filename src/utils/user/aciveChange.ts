@@ -1,4 +1,4 @@
-import type {User, responseUser} from "@/models/userModel";
+import type {User, responseUser} from "../../models/userModel";
 import {API_HOST} from "../variable";
 
 export default async function ActiveChange(

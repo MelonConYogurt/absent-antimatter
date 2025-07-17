@@ -1,8 +1,8 @@
 import {useState, useEffect} from "react";
-import SearchClients from "@/utils/client/searchClients";
+import SearchClients from "../utils/client/searchClients";
 import type {client} from "../models/clientModel";
 import TableClient from "./tableClients";
-import DeleteClient from "@/utils/client/deleteClient";
+import DeleteClient from "../utils/client/deleteClient";
 import {Toaster, toast} from "sonner";
 
 import {Search, ChevronLeft, ChevronRight, X, Loader2} from "lucide-react";

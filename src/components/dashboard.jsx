@@ -1,14 +1,14 @@
 import {BarChart} from "@mui/x-charts/BarChart";
 import {LineChart} from "@mui/x-charts/LineChart";
 import {useEffect, useState} from "react";
-import {getSalesByDay} from "@/utils/dashboard/saleBySpecificDay";
+import {getSalesByDay} from "../utils/dashboard/saleBySpecificDay";
 import {getSalesThisMonth} from "../utils/dashboard/salesMonthly";
 import {Toaster, toast} from "sonner";
 import {Loader2, TriangleAlert} from "lucide-react";
 import getTopSalesProducts from "../utils/dashboard/topSellingProducts";
 import getSalesToday from "../utils/dashboard/salesToday";
 import getTotalInventoryValue from "../utils/dashboard/totalInventoryValue";
-import getLowStockProduts from "@/utils/dashboard/lowStockProducts";
+import getLowStockProduts from "../utils/dashboard/lowStockProducts";
 
 export default function Dashboard() {
   const [dataset, setDataset] = useState(null);

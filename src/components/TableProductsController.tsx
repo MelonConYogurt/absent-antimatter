@@ -1,12 +1,12 @@
 import TableProducts from "./tableProducts";
 import {useState, useEffect, use} from "react";
 import {Toaster, toast} from "sonner";
-import type {Product, ProductUpdate} from "@/models/productmodel";
-import SearchProducts from "@/utils/products/searchProducts";
+import type {Product, ProductUpdate} from "../models/productmodel";
+import SearchProducts from "../utils/products/searchProducts";
 import {ChevronLeft, ChevronRight, Loader2, Search, X} from "lucide-react";
-import UpdateProduct from "@/utils/products/updateProduct";
-import DeleteProduct from "@/utils/products/deleteProduct";
-import toggleActiveStateProduct from "@/utils/products/toggleActiveStateProduct";
+import UpdateProduct from "../utils/products/updateProduct";
+import DeleteProduct from "../utils/products/deleteProduct";
+import toggleActiveStateProduct from "../utils/products/toggleActiveStateProduct";
 
 export default function TableProductsController() {
   const [loading, setLoading] = useState(false);

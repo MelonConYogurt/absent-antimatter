@@ -6,7 +6,7 @@ export default function LoginComponent() {
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-900">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <div className="flex justify-center items-center">
-            <div className="bg-gray-600 rounded-full w-35 h-35 flex justify-center items-center">
+            <div className="bg-gray-600 rounded-full w-35 h-35 flex justify-center items-center ">
               <Package color="white" className="w-30 h-30" />
             </div>
           </div>
