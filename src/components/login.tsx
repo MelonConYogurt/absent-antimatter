@@ -19,7 +19,7 @@ export default function LoginComponent() {
     if (credentials) {
       const response = await getToken(credentials.email, credentials.password);
       if (response) {
-        console.log(response);
+        console.log("Datos enviados con exito");
       }
     }
   }

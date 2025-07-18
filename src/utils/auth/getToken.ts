@@ -16,7 +16,8 @@ export default async function getToken(email: string, password: string) {
 
     if (response.ok) {
       const data = await response.json();
-      return data.access_token;
+      localStorage.setItem("accessToken", data.access_token);
+      return true;
     } else {
       const errorData = await response.json();
       throw new Error(errorData.detail || "Failed to fetch token");
